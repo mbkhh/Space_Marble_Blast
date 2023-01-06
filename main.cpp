@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cmath>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
@@ -26,18 +27,28 @@ int main(int argv, char **args)
     if (renderer == NULL)
 		std::cout << "SDL fail to create renderer . error : " << SDL_GetError() << std::endl;
     
+    //Load resources
+    SDL_Texture* stone_background = IMG_LoadTexture(renderer , "assest/stone_background.jpg");
+    SDL_Texture* Red_marble = IMG_LoadTexture(renderer , "assest/marble_red.png");
+    SDL_Texture* ADD = IMG_LoadTexture(renderer , "assest/Add.png");
+    SDL_Texture* Cannon = IMG_LoadTexture(renderer , "assest/cannon.png");
+
+
+
     SDL_SetRenderDrawColor( renderer, 0, 0,255, 0 );
     SDL_RenderClear( renderer );
     
+
     Player player;
-    player.location = 100;
-    player.printloc();
-    
+    player.creat(Cannon , 100 , 100 , 150 , 150 , 75 , 103 );
+    string mode="login_menu";
+    SDL_Rect fullScreen = {0 , 0 , screenWidth , screenHeight};
+
     bool is_gameRunning = true;
 	SDL_Event event;
 	Uint32 frameStart;
 	int frameTime;
-    int mouthX,mouthY;
+    SDL_Point mouth;
     bool mouthL;
 
     while (is_gameRunning)
@@ -52,7 +63,7 @@ int main(int argv, char **args)
                 is_gameRunning = false;
                 break;
             case SDL_MOUSEMOTION:
-                SDL_GetMouseState(&mouthX , &mouthY);
+                SDL_GetMouseState(&mouth.x , &mouth.y);
                 break;
             case SDL_MOUSEBUTTONDOWN:
                 if(event.button.button == SDL_BUTTON_LEFT)
@@ -68,8 +79,18 @@ int main(int argv, char **args)
                 break;
             }
         }
-        if(mouthL)
-            cout<<"hello"<<endl;
+        SDL_RenderClear(renderer);
+        if(mode == "login_menu")
+        {
+            //SDL_RenderCopy(renderer , stone_background , NULL , &fullScreen);
+            player.Draw(renderer,&mouth);
+            //SDL_RenderCopyEx(renderer , Cannon , NULL , &test ,(atan2( mouth.y-(center.y+test.y) , mouth.y - (center.x+test.x))*180)/M_PI,&center , SDL_FLIP_NONE);
+            SDL_SetRenderDrawColor(renderer , 255 , 0 , 0 ,255);
+            SDL_RenderDrawPoint(renderer , 175,203);
+            SDL_SetRenderDrawColor( renderer, 0, 0,255, 0 );
+            //SDL_RenderCopy(renderer , Red_marble , NULL , &test);
+        }
+        //cout<<mouthX<<" "<<mouthY<<endl;
 
         SDL_RenderPresent(renderer);
 
@@ -80,4 +101,3 @@ int main(int argv, char **args)
     
     return 0;
 }
-
