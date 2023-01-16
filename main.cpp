@@ -6,6 +6,7 @@
 #include <SDL2/SDL_mixer.h>
 using namespace std;
 #include "player.hpp"
+#include "ball.hpp"
 #define screenWidth 1280
 #define screenHeight 800
 
@@ -29,7 +30,10 @@ int main(int argv, char **args)
     
     //Load resources
     SDL_Texture* stone_background = IMG_LoadTexture(renderer , "assest/stone_background.jpg");
-    SDL_Texture* Red_marble = IMG_LoadTexture(renderer , "assest/marble_red.png");
+    SDL_Texture* Red_marble = IMG_LoadTexture(renderer , "assest/red_marble.png");
+    SDL_Texture* Green_marble = IMG_LoadTexture(renderer , "assest/green_marble.png");
+    SDL_Texture* Blue_marble = IMG_LoadTexture(renderer , "assest/blue_marble.png");
+    SDL_Texture* Yellow_marble = IMG_LoadTexture(renderer , "assest/yellow_marble.png");
     SDL_Texture* ADD = IMG_LoadTexture(renderer , "assest/Add.png");
     SDL_Texture* Cannon = IMG_LoadTexture(renderer , "assest/cannon.png");
 
@@ -40,7 +44,7 @@ int main(int argv, char **args)
     
 
     Player player;
-    player.creat(Cannon , 100 , 100 , 150 , 150 , 75 , 103 );
+    player.creat(Cannon , 500 , 300 , 200 , 80 , 40 , 40 );
     string mode="login_menu";
     SDL_Rect fullScreen = {0 , 0 , screenWidth , screenHeight};
 
