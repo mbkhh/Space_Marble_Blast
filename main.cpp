@@ -6,6 +6,7 @@
 #include <SDL2/SDL_mixer.h>
 using namespace std;
 #include "player.hpp"
+#include "map.hpp"
 #include "ball.hpp"
 #define screenWidth 1280
 #define screenHeight 800
@@ -39,15 +40,26 @@ int main(int argv, char **args)
 
 
 
-    SDL_SetRenderDrawColor( renderer, 0, 0,255, 0 );
-    SDL_RenderClear( renderer );
+    //SDL_SetRenderDrawColor( renderer, 0, 0,255, 0 );
+    //SDL_RenderClear( renderer );
     
 
     Player player;
-    player.creat(Cannon , 500 , 300 , 200 , 80 , 40 , 40 );
+    player.creat(Cannon , screenWidth/2 , 300 , 200 , 80 , 40 , 40 );
     string mode="login_menu";
     SDL_Rect fullScreen = {0 , 0 , screenWidth , screenHeight};
-
+    map ma;
+    ma.p1 = {0,screenHeight};
+    ma.p2 = {screenWidth/2,0};
+    ma.p3 = {0,0};
+    ma.p4 = {screenWidth/2 , screenHeight};
+    ma.p5 = {screenWidth,0};
+    ma.p6 = {screenWidth/2,0};
+    ma.p7 = {screenWidth , screenHeight};
+    Ball ba;
+    ba.t = 0 ;
+    ba.tex = Red_marble;
+    ba.rect = {0,0,60,60};
     bool is_gameRunning = true;
 	SDL_Event event;
 	Uint32 frameStart;
@@ -83,17 +95,22 @@ int main(int argv, char **args)
                 break;
             }
         }
+        SDL_SetRenderDrawColor(renderer , 0 , 0 , 0 ,255);
         SDL_RenderClear(renderer);
+        ba.Draw(renderer , &ma);
         if(mode == "login_menu")
         {
             //SDL_RenderCopy(renderer , stone_background , NULL , &fullScreen);
             player.Draw(renderer,&mouth);
             //SDL_RenderCopyEx(renderer , Cannon , NULL , &test ,(atan2( mouth.y-(center.y+test.y) , mouth.y - (center.x+test.x))*180)/M_PI,&center , SDL_FLIP_NONE);
-            SDL_SetRenderDrawColor(renderer , 255 , 0 , 0 ,255);
-            SDL_RenderDrawPoint(renderer , 175,203);
-            SDL_SetRenderDrawColor( renderer, 0, 0,255, 0 );
+            //SDL_SetRenderDrawColor(renderer , 255 , 0 , 0 ,255);
+            //SDL_RenderDrawPoint(renderer , 175,203);
+            //SDL_SetRenderDrawColor( renderer, 0, 0,255, 0 );
             //SDL_RenderCopy(renderer , Red_marble , NULL , &test);
         }
+        //SDL_SetRenderDrawColor(renderer , 0 , 255 , 0 ,255);
+        ma.draw_path(renderer);
+        //SDL_SetRenderDrawColor(renderer , 0 , 255 , 0 ,255);
         //cout<<mouthX<<" "<<mouthY<<endl;
 
         SDL_RenderPresent(renderer);
