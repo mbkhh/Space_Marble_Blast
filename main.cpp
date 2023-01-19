@@ -37,9 +37,9 @@ int main(int argv, char **args)
     SDL_Texture* Yellow_marble = IMG_LoadTexture(renderer , "assest/yellow_marble.png");
     SDL_Texture* ADD = IMG_LoadTexture(renderer , "assest/Add.png");
     SDL_Texture* Cannon = IMG_LoadTexture(renderer , "assest/cannon.png");
+    SDL_Texture* PathTex = IMG_LoadTexture(renderer , "assest/path2.png");
 
-
-
+    SDL_Texture* BackGround = SDL_CreateTexture(renderer , SDL_PIXELFORMAT_UNKNOWN , SDL_TEXTUREACCESS_TARGET , screenWidth , screenHeight);
     //SDL_SetRenderDrawColor( renderer, 0, 0,255, 0 );
     //SDL_RenderClear( renderer );
     
@@ -49,17 +49,38 @@ int main(int argv, char **args)
     string mode="login_menu";
     SDL_Rect fullScreen = {0 , 0 , screenWidth , screenHeight};
     map ma;
-    ma.p1 = {0,screenHeight};
-    ma.p2 = {screenWidth/2,0};
+    ma.tex = PathTex;
+    ma.p1 = {50,screenHeight-100};
+    ma.p2 = {screenWidth/2-200,screenHeight/2};
     ma.p3 = {0,0};
-    ma.p4 = {screenWidth/2 , screenHeight};
-    ma.p5 = {screenWidth,0};
-    ma.p6 = {screenWidth/2,0};
-    ma.p7 = {screenWidth , screenHeight};
+    ma.p4 = {screenWidth/4 ,100};
+    ma.p6 = {screenWidth,0};
+    ma.p5 = {screenWidth/2,200};
+    ma.p7 = {screenWidth-100 , screenHeight-100};
+
+    SDL_SetRenderTarget(renderer , BackGround);
+    SDL_SetRenderDrawColor(renderer , 0 , 0 , 0 ,255);
+    SDL_RenderClear(renderer);
+    ma.draw_path(renderer);
+    ma.find_distance_samples();
+    SDL_SetRenderTarget(renderer , NULL);
+
     Ball ba;
-    ba.t = 0 ;
     ba.tex = Red_marble;
-    ba.rect = {0,0,60,60};
+    ba.color = "Red";
+    ba.v = 2;
+    ba.total_path = ma.total_lenght;
+    ba.rect = {0,0,50,50};
+    ba.current_loc = 0 ;
+
+    Ball ba2;
+    ba2.current_loc = 50 ;
+    ba2.color = "Green";
+    ba2.v = 2;
+    ba2.total_path = ma.total_lenght;
+    ba2.tex = Green_marble;
+    ba2.rect = {0,0,50,50};
+
     bool is_gameRunning = true;
 	SDL_Event event;
 	Uint32 frameStart;
@@ -97,27 +118,19 @@ int main(int argv, char **args)
         }
         SDL_SetRenderDrawColor(renderer , 0 , 0 , 0 ,255);
         SDL_RenderClear(renderer);
-        ba.Draw(renderer , &ma);
+        SDL_RenderCopy(renderer , BackGround , NULL , NULL);
         if(mode == "login_menu")
         {
-            //SDL_RenderCopy(renderer , stone_background , NULL , &fullScreen);
             player.Draw(renderer,&mouth);
-            //SDL_RenderCopyEx(renderer , Cannon , NULL , &test ,(atan2( mouth.y-(center.y+test.y) , mouth.y - (center.x+test.x))*180)/M_PI,&center , SDL_FLIP_NONE);
-            //SDL_SetRenderDrawColor(renderer , 255 , 0 , 0 ,255);
-            //SDL_RenderDrawPoint(renderer , 175,203);
-            //SDL_SetRenderDrawColor( renderer, 0, 0,255, 0 );
-            //SDL_RenderCopy(renderer , Red_marble , NULL , &test);
         }
-        //SDL_SetRenderDrawColor(renderer , 0 , 255 , 0 ,255);
-        ma.draw_path(renderer);
-        //SDL_SetRenderDrawColor(renderer , 0 , 255 , 0 ,255);
-        //cout<<mouthX<<" "<<mouthY<<endl;
-
+        ba.Draw(renderer , &ma);
+        ba2.Draw(renderer , &ma);
         SDL_RenderPresent(renderer);
 
         frameTime = SDL_GetTicks() - frameStart;
-		if (frameTime < frameDelay)
-			SDL_Delay(frameDelay - frameTime);
+		if (frameTime < frameDelay){
+        	SDL_Delay(frameDelay - frameTime);
+        }
     }
     
     return 0;
