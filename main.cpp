@@ -1,21 +1,29 @@
 #include <iostream>
 #include <cmath>
+#include <vector>
+#include <time.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL_mixer.h>
 using namespace std;
-#include "player.hpp"
-#include "map.hpp"
-#include "ball.hpp"
 #define screenWidth 1280
 #define screenHeight 800
 
 const int FPS = 60;
 const int frameDelay = 1000 / FPS;
+enum ball_modes {RED , GREEN , BLUE , YELLOW};
+
+#include "functions.hpp"
+#include "timer.hpp"
+#include "player.hpp"
+#include "map.hpp"
+#include "ball.hpp"
+
 
 int main(int argv, char **args)
 {
+    srand(time(NULL));
     if (SDL_Init(SDL_INIT_EVERYTHING) > 0)
 		std::cout << "SDL Init fail .error : " << SDL_GetError() << std::endl;
   	if (IMG_Init(IMG_INIT_PNG) == 0)
@@ -65,33 +73,37 @@ int main(int argv, char **args)
     ma.find_distance_samples();
     SDL_SetRenderTarget(renderer , NULL);
 
-    Ball ba;
-    ba.tex = Red_marble;
-    ba.color = "Red";
-    ba.v = 2;
-    ba.total_path = ma.total_lenght;
-    ba.rect = {0,0,50,50};
-    ba.current_loc = 0 ;
+    int balls_width = 50;
+    Ball in_air_balls[20];
+    int in_air_count = 0;
+    int bullet_speed = 12;
+    
+    int balls_v = 2;
+    int count_ball = 30;
+    Ball balls[count_ball];
+    creat_start_balls(count_ball , balls , ma.total_lenght , balls_width , Red_marble , Green_marble , Blue_marble , Yellow_marble);
+    balls[29].current_loc = 800;
+    balls[29].leftConnnected = false;
+    balls[28].rightConnnected = false;
+    balls[28].current_loc = 560;
+    balls[27].current_loc = 510;
+    balls[27].leftConnnected = false;
+    balls[26].rightConnnected = false;
 
-    Ball ba2;
-    ba2.current_loc = 50 ;
-    ba2.color = "Green";
-    ba2.v = 2;
-    ba2.total_path = ma.total_lenght;
-    ba2.tex = Green_marble;
-    ba2.rect = {0,0,50,50};
-
+    Ball bullet;
+    bullet.creat_cannon_ball(Red_marble , "Red" , &player , balls_width , bullet_speed);
+    
+    Timer bullet_shoot;
     bool is_gameRunning = true;
 	SDL_Event event;
 	Uint32 frameStart;
 	int frameTime;
     SDL_Point mouth;
-    bool mouthL;
+    bool mouthL = false;
 
     while (is_gameRunning)
     {
         frameStart = SDL_GetTicks();
-
         while (SDL_PollEvent(&event))
         {
             switch (event.type)
@@ -119,14 +131,48 @@ int main(int argv, char **args)
         SDL_SetRenderDrawColor(renderer , 0 , 0 , 0 ,255);
         SDL_RenderClear(renderer);
         SDL_RenderCopy(renderer , BackGround , NULL , NULL);
+
         if(mode == "login_menu")
         {
             player.Draw(renderer,&mouth);
         }
-        ba.Draw(renderer , &ma);
-        ba2.Draw(renderer , &ma);
-        SDL_RenderPresent(renderer);
 
+        handle_map_balls(count_ball , balls , balls_v , &ma);
+
+        for(int i = 0 ; i < count_ball ; i++)
+        {
+            balls[i].Draw(renderer);            
+        }
+
+
+
+        if((mouthL &&in_air_count==0 )|| (mouthL && bullet.is_in_cannon && in_air_count < 20 && bullet_shoot.get_current_time() > 100))
+        {
+            bullet.shoot(&mouth);
+            in_air_balls[in_air_count] = bullet;
+            bullet_shoot.creat();
+            in_air_count++;
+            bullet.creat_cannon_ball(Green_marble , "Green" , &player , balls_width , bullet_speed);
+        }
+
+        bullet.update();
+        bullet.Draw(renderer);
+        int deleted_index = -1;
+
+        for(int i = 0 ; i < in_air_count;i++)
+        {
+            in_air_balls[i].update();
+            in_air_balls[i].Draw(renderer);
+            if(in_air_balls[i].is_out())
+                deleted_index = i;
+        }
+        if(deleted_index != -1)
+        {
+            delete_ball(in_air_balls , in_air_count , deleted_index);
+            in_air_count--;
+        }
+
+        SDL_RenderPresent(renderer);
         frameTime = SDL_GetTicks() - frameStart;
 		if (frameTime < frameDelay){
         	SDL_Delay(frameDelay - frameTime);
