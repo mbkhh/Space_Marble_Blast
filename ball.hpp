@@ -179,3 +179,24 @@ void delete_ball(Ball balls[] , int count_ball , int index = -1 , int andises[]=
     for(int i = 0 ; i < answer_count ; i++)
         balls[i] = ans[i];
 }
+void make_cannon_ball(int count_ball , Ball balls[] , Ball* bullet , int ball_width ,int v , Player* player, SDL_Texture* Red_marble , SDL_Texture* Green_marble , SDL_Texture* Blue_marble , SDL_Texture* Yellow_marble)
+{
+    int count_of_ball_mode = 4;
+    int chances[] = {1 , 1 , 1 , 1};
+    int mode = random(chances , count_of_ball_mode);
+    switch (mode)
+    {
+    case RED:
+        bullet->creat_cannon_ball(Red_marble , "Red" , player , ball_width , v);
+        break;
+    case GREEN:
+        bullet->creat_cannon_ball(Green_marble , "Green" , player , ball_width , v);
+        break;
+    case BLUE:
+        bullet->creat_cannon_ball(Blue_marble , "Blue" , player , ball_width , v);
+        break;
+    case YELLOW:
+        bullet->creat_cannon_ball(Yellow_marble , "Yellow" , player , ball_width , v);
+        break;
+    }        
+}

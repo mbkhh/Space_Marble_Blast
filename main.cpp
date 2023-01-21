@@ -61,7 +61,7 @@ int main(int argv, char **args)
     ma.p1 = {50,screenHeight-100};
     ma.p2 = {screenWidth/2-200,screenHeight/2};
     ma.p3 = {0,0};
-    ma.p4 = {screenWidth/4 ,100};
+    ma.p4 = {screenWidth/4 ,700};
     ma.p6 = {screenWidth,0};
     ma.p5 = {screenWidth/2,200};
     ma.p7 = {screenWidth-100 , screenHeight-100};
@@ -70,7 +70,6 @@ int main(int argv, char **args)
     SDL_SetRenderDrawColor(renderer , 0 , 0 , 0 ,255);
     SDL_RenderClear(renderer);
     ma.draw_path(renderer);
-    ma.find_distance_samples();
     SDL_SetRenderTarget(renderer , NULL);
 
     int balls_width = 50;
@@ -91,7 +90,7 @@ int main(int argv, char **args)
     balls[26].rightConnnected = false;
 
     Ball bullet;
-    bullet.creat_cannon_ball(Red_marble , "Red" , &player , balls_width , bullet_speed);
+    make_cannon_ball(count_ball , balls , &bullet ,  balls_width , bullet_speed , &player , Red_marble , Green_marble , Blue_marble , Yellow_marble);
     
     Timer bullet_shoot;
     bool is_gameRunning = true;
@@ -152,7 +151,7 @@ int main(int argv, char **args)
             in_air_balls[in_air_count] = bullet;
             bullet_shoot.creat();
             in_air_count++;
-            bullet.creat_cannon_ball(Green_marble , "Green" , &player , balls_width , bullet_speed);
+            make_cannon_ball(count_ball , balls , &bullet ,  balls_width , bullet_speed , &player , Red_marble , Green_marble , Blue_marble , Yellow_marble);
         }
 
         bullet.update();
