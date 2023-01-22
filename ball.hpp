@@ -9,7 +9,7 @@ struct Ball
     double total_path;
     bool leftConnnected=true , rightConnnected=true;
     bool is_in_cannon = false,is_primary=false;
-    double velocity,v_x,v_y;
+    double velocity,v_x,v_y,normal_v=0;
     double angle;
     void creat_cannon_ball(SDL_Texture* texture , string mode , Player* player , int width , int v)
     {
@@ -19,6 +19,7 @@ struct Ball
         center.y = player->center.y + player->rect.y;
         is_in_cannon = true;
         is_primary = true;
+        color = mode;
         rect = {0 , 0 , width , width};
     }
     void shoot(SDL_Point* mouth)
@@ -46,6 +47,7 @@ struct Ball
             if(current_loc > total_path)
                 current_loc = 0;
             current_loc += v;
+            current_loc += normal_v;
             if(current_loc >= 0)
             {
                 lastT = ma->getT_distance(current_loc , (lastT-5)/2);
@@ -134,6 +136,7 @@ void handle_map_balls(int count_ball , Ball balls[] , int balls_v , map* ma )
         {
             balls[i].update(ma , balls_v);
             balls[i].current_loc = balls[i-1].current_loc +balls[i].rect.w;
+            balls[i].normal_v = 0;
             last = i;
         }
         else
@@ -199,4 +202,146 @@ void make_cannon_ball(int count_ball , Ball balls[] , Ball* bullet , int ball_wi
         bullet->creat_cannon_ball(Yellow_marble , "Yellow" , player , ball_width , v);
         break;
     }        
+}
+bool check_ball_collision(Ball* b1 , Ball* b2)
+{
+    if(SDL_HasIntersection(&b1->rect , &b2->rect))
+        return true;
+    else
+        return false;
+}
+bool ball_collision_delete(Ball balls[], int* count_ball , int b ,Ball* bullet , bool is_right , int ball_v)
+{
+    if(bullet->color == balls[b].color || (is_right && balls[b].rightConnnected && b < *count_ball-1 && balls[b+1].color == bullet->color) || (!is_right && balls[b].leftConnnected && b != 0 && balls[b-1].color == bullet->color))
+    {
+        if(is_right)
+            if(b+1 >= *count_ball || bullet->color != balls[b].color || !balls[b].rightConnnected || bullet->color != balls[b+1].color )
+                if(b == 0 || bullet->color != balls[b].color || !balls[b].leftConnnected || bullet->color != balls[b-1].color)
+                    if(b+2 >= *count_ball || bullet->color != balls[b+1].color || !balls[b+1].rightConnnected || bullet->color != balls[b+2].color)
+                        return false;
+        if(!is_right)
+            if(b+1 >= *count_ball || bullet->color != balls[b].color || !balls[b].rightConnnected || bullet->color != balls[b+1].color )
+                if(b == 0 || bullet->color != balls[b].color || !balls[b].leftConnnected || bullet->color != balls[b-1].color)
+                    if(b-1 == 0 || bullet->color != balls[b-1].color || !balls[b-1].leftConnnected || bullet->color != balls[b-2].color)
+                        return false;
+        
+        int deleted_count = 0;
+        int max_left,max_right;
+        int deleted[50];
+        if(is_right)
+        {
+            max_right = b+1;
+            max_left = b;
+            for(int i = b ; i >= 0 ; i--)
+            {
+                if(balls[i].color == bullet->color)
+                {
+                    cout<<i<<" chit "<<endl;
+                    deleted[deleted_count++]=i;
+                    max_left--;
+                }
+                else
+                    break;
+                if(!balls[i].leftConnnected)
+                    break;
+            }
+            if(b+1 < *count_ball)
+            {
+                for(int i = b+1  ; i < *count_ball ;i++)
+                {
+                    if(balls[i].color == bullet->color)
+                    {
+                        cout<<i<<" chit "<<endl;
+                        deleted[deleted_count++]=i;
+                        max_right++;
+                    }
+                    else
+                        break;
+                    if(!balls[i].rightConnnected)
+                        break;
+                } 
+            }
+        }
+        else
+        {
+            max_right = b;
+            max_left = b-1;
+            for(int i = b ; i < *count_ball ; i++)
+            {
+                if(balls[i].color == bullet->color)
+                {
+                    cout<<i<<" chit "<<endl;
+                    deleted[deleted_count++]=i;
+                    max_right++;
+                }
+                else
+                    break;
+                if(!balls[i].rightConnnected)
+                    break;
+            }
+            if(b > 0)
+            {
+                for(int i = b-1  ; i >= 0 ;i--)
+                {
+                    if(balls[i].color == bullet->color)
+                    {
+                        cout<<i<<" chit "<<endl;
+                        deleted[deleted_count++]=i;
+                        max_left--;
+                    }
+                    else
+                        break;
+                    if(!balls[i].leftConnnected)
+                        break;
+                } 
+            }
+        }
+        if(max_right < *count_ball)
+            balls[max_right].leftConnnected = false;
+        if(max_left >= 0)
+            balls[max_left].rightConnnected = false;
+        if(max_left >=0 && max_right < *count_ball)
+        {
+            if(balls[max_left].color == balls[max_right].color)
+            {
+                for(int i = max_right ; i < *count_ball ; i++)
+                {
+                    balls[i].normal_v = -4 * ball_v;
+                    if(!balls[i].rightConnnected)
+                        break;
+                }
+            }
+        }
+        delete_ball(balls , *count_ball , -1 , deleted , deleted_count);
+        *count_ball-=deleted_count;
+        return true;
+    }
+    else
+        return false;
+}
+void collision(Ball balls[] , int* count_ball , int b , Ball* bullet ,map* ma , int ball_v)
+{
+    /* NOTE
+        check for special balls
+    */
+    bool is_right;
+    double x1,y1,x2,y2;
+    ma->get_point(ma->getT_distance(balls[b].current_loc + 15) , nullptr , &x1 , &y1);
+    ma->get_point(ma->getT_distance(balls[b].current_loc - 15) , nullptr , &x2 , &y2);
+    double dis1 = sqrt((bullet->center.x - x1)*(bullet->center.x - x1) + (bullet->center.y - y1)*(bullet->center.y - y1));
+    double dis2 = sqrt((bullet->center.x - x2)*(bullet->center.x - x2) + (bullet->center.y - y2)*(bullet->center.y - y2));
+    if(dis1 > dis2)
+    {
+        is_right = false;
+    }
+    else
+    {
+        is_right = true;
+    }
+    ball_collision_delete( balls ,count_ball, b ,  bullet , is_right , ball_v);
+    // if(ball_collition_delete( balls ,count_ball, b ,  bullet , is_right))
+    //     cout<<"yes";
+    // else
+    //     cout<<"no";
+
 }

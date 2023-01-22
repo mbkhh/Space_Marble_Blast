@@ -61,7 +61,7 @@ int main(int argv, char **args)
     ma.p1 = {50,screenHeight-100};
     ma.p2 = {screenWidth/2-200,screenHeight/2};
     ma.p3 = {0,0};
-    ma.p4 = {screenWidth/4 ,700};
+    ma.p4 = {screenWidth/4 ,100};
     ma.p6 = {screenWidth,0};
     ma.p5 = {screenWidth/2,200};
     ma.p7 = {screenWidth-100 , screenHeight-100};
@@ -77,7 +77,7 @@ int main(int argv, char **args)
     int in_air_count = 0;
     int bullet_speed = 12;
     
-    int balls_v = 2;
+    int balls_v = 1;
     int count_ball = 30;
     Ball balls[count_ball];
     creat_start_balls(count_ball , balls , ma.total_lenght , balls_width , Red_marble , Green_marble , Blue_marble , Yellow_marble);
@@ -145,7 +145,7 @@ int main(int argv, char **args)
 
 
 
-        if((mouthL &&in_air_count==0 )|| (mouthL && bullet.is_in_cannon && in_air_count < 20 && bullet_shoot.get_current_time() > 100))
+        if((mouthL &&in_air_count==0 )|| (mouthL && bullet.is_in_cannon && in_air_count < 20 && bullet_shoot.get_current_time() > 600))
         {
             bullet.shoot(&mouth);
             in_air_balls[in_air_count] = bullet;
@@ -164,7 +164,16 @@ int main(int argv, char **args)
             in_air_balls[i].Draw(renderer);
             if(in_air_balls[i].is_out())
                 deleted_index = i;
+            for(int j = 0 ; j < count_ball ; j++)
+            {
+                if(check_ball_collision(&in_air_balls[i] , &balls[j]))
+                {
+                    collision(balls ,&count_ball ,j , &in_air_balls[i] , &ma , balls_v);
+                    deleted_index = i;
+                }
+            }
         }
+        //cout<<count_ball<<endl;
         if(deleted_index != -1)
         {
             delete_ball(in_air_balls , in_air_count , deleted_index);
@@ -174,7 +183,7 @@ int main(int argv, char **args)
         SDL_RenderPresent(renderer);
         frameTime = SDL_GetTicks() - frameStart;
 		if (frameTime < frameDelay){
-        	SDL_Delay(frameDelay - frameTime);
+            SDL_Delay(frameDelay - frameTime);
         }
     }
     
