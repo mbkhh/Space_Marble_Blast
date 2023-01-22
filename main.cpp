@@ -77,7 +77,7 @@ int main(int argv, char **args)
     int in_air_count = 0;
     int bullet_speed = 12;
     
-    int balls_v = 1;
+    int balls_v = 2;
     int count_ball = 30;
     Ball balls[count_ball];
     creat_start_balls(count_ball , balls , ma.total_lenght , balls_width , Red_marble , Green_marble , Blue_marble , Yellow_marble);
