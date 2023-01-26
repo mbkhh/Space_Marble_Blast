@@ -36,14 +36,14 @@ int main(int argv, char **args)
     SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     if (renderer == NULL)
 		std::cout << "SDL fail to create renderer . error : " << SDL_GetError() << std::endl;
-    
+
     //Load resources
-    SDL_Texture* stone_background = IMG_LoadTexture(renderer , "assest/stone_background.jpg");
+    //SDL_Texture* stone_background = IMG_LoadTexture(renderer , "assest/stone_background.jpg");
     SDL_Texture* Red_marble = IMG_LoadTexture(renderer , "assest/red_marble.png");
     SDL_Texture* Green_marble = IMG_LoadTexture(renderer , "assest/green_marble.png");
     SDL_Texture* Blue_marble = IMG_LoadTexture(renderer , "assest/blue_marble.png");
     SDL_Texture* Yellow_marble = IMG_LoadTexture(renderer , "assest/yellow_marble.png");
-    SDL_Texture* ADD = IMG_LoadTexture(renderer , "assest/Add.png");
+    //SDL_Texture* ADD = IMG_LoadTexture(renderer , "assest/Add.png");
     SDL_Texture* Cannon = IMG_LoadTexture(renderer , "assest/cannon.png");
     SDL_Texture* PathTex = IMG_LoadTexture(renderer , "assest/path2.png");
 
@@ -79,7 +79,7 @@ int main(int argv, char **args)
     
     int balls_v = 2;
     int count_ball = 30;
-    Ball balls[count_ball];
+    Ball balls[200];
     creat_start_balls(count_ball , balls , ma.total_lenght , balls_width , Red_marble , Green_marble , Blue_marble , Yellow_marble);
     balls[29].current_loc = 800;
     balls[29].leftConnnected = false;
@@ -168,8 +168,9 @@ int main(int argv, char **args)
             {
                 if(check_ball_collision(&in_air_balls[i] , &balls[j]))
                 {
-                    collision(balls ,&count_ball ,j , &in_air_balls[i] , &ma , balls_v);
+                    collision(balls ,&count_ball ,j , &in_air_balls[i] , &ma , balls_v , balls_width);
                     deleted_index = i;
+                    break;
                 }
             }
         }
@@ -183,6 +184,7 @@ int main(int argv, char **args)
         SDL_RenderPresent(renderer);
         frameTime = SDL_GetTicks() - frameStart;
 		if (frameTime < frameDelay){
+            //cout<<frameDelay - frameTime<<endl;
             SDL_Delay(frameDelay - frameTime);
         }
     }

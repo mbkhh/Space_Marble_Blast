@@ -56,8 +56,7 @@ struct map
             dst.y = p.y - dst.h / 2;
             total_lenght += sqrt((y2 - y1) * (y2 - y1) + (x2 - x1) * (x2 - x1));
             distance_samples[t] = total_lenght;
-            if(t%1 ==0)
-                SDL_RenderCopyEx(renderer, tex, NULL, &dst, (atan2((double)(y2 - y1), (double)(x2 - x1)) * 180) / M_PI, NULL, SDL_FLIP_NONE);
+            SDL_RenderCopyEx(renderer, tex, NULL, &dst, (atan2((double)(y2 - y1), (double)(x2 - x1)) * 180) / M_PI, NULL, SDL_FLIP_NONE);
             if(draw_base)
                 SDL_RenderDrawPoint(renderer, p.x, p.y);
             p_last = p;
