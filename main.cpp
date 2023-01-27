@@ -12,7 +12,7 @@ using namespace std;
 
 const int FPS = 60;
 const int frameDelay = 1000 / FPS;
-enum ball_modes {RED , GREEN , BLUE , YELLOW};
+enum ball_modes {RED , GREEN , BLUE , YELLOW , Black , Question};
 
 #include "functions.hpp"
 #include "timer.hpp"
@@ -43,7 +43,9 @@ int main(int argv, char **args)
     SDL_Texture* Green_marble = IMG_LoadTexture(renderer , "assest/green_marble.png");
     SDL_Texture* Blue_marble = IMG_LoadTexture(renderer , "assest/blue_marble.png");
     SDL_Texture* Yellow_marble = IMG_LoadTexture(renderer , "assest/yellow_marble.png");
-    //SDL_Texture* ADD = IMG_LoadTexture(renderer , "assest/Add.png");
+    SDL_Texture* Black_marble = IMG_LoadTexture(renderer , "assest/black_marble.png");
+    SDL_Texture* Question_marble = IMG_LoadTexture(renderer , "assest/question_marble.png");
+    SDL_Texture* stone_background = IMG_LoadTexture(renderer , "assest/stone_background.jpg");
     SDL_Texture* Cannon = IMG_LoadTexture(renderer , "assest/cannon.png");
     SDL_Texture* PathTex = IMG_LoadTexture(renderer , "assest/path2.png");
 
@@ -52,47 +54,9 @@ int main(int argv, char **args)
     //SDL_RenderClear( renderer );
     
 
-    Player player;
-    player.creat(Cannon , screenWidth/2 , 300 , 200 , 80 , 40 , 40 );
     string mode="login_menu";
     SDL_Rect fullScreen = {0 , 0 , screenWidth , screenHeight};
-    map ma;
-    ma.tex = PathTex;
-    ma.p1 = {50,screenHeight-100};
-    ma.p2 = {screenWidth/2-200,screenHeight/2};
-    ma.p3 = {0,0};
-    ma.p4 = {screenWidth/4 ,100};
-    ma.p6 = {screenWidth,0};
-    ma.p5 = {screenWidth/2,200};
-    ma.p7 = {screenWidth-100 , screenHeight-100};
 
-    SDL_SetRenderTarget(renderer , BackGround);
-    SDL_SetRenderDrawColor(renderer , 0 , 0 , 0 ,255);
-    SDL_RenderClear(renderer);
-    ma.draw_path(renderer);
-    SDL_SetRenderTarget(renderer , NULL);
-
-    int balls_width = 50;
-    Ball in_air_balls[20];
-    int in_air_count = 0;
-    int bullet_speed = 12;
-    
-    int balls_v = 2;
-    int count_ball = 30;
-    Ball balls[200];
-    creat_start_balls(count_ball , balls , ma.total_lenght , balls_width , Red_marble , Green_marble , Blue_marble , Yellow_marble);
-    balls[29].current_loc = 800;
-    balls[29].leftConnnected = false;
-    balls[28].rightConnnected = false;
-    balls[28].current_loc = 560;
-    balls[27].current_loc = 510;
-    balls[27].leftConnnected = false;
-    balls[26].rightConnnected = false;
-
-    Ball bullet;
-    make_cannon_ball(count_ball , balls , &bullet ,  balls_width , bullet_speed , &player , Red_marble , Green_marble , Blue_marble , Yellow_marble);
-    
-    Timer bullet_shoot;
     bool is_gameRunning = true;
 	SDL_Event event;
 	Uint32 frameStart;
@@ -129,56 +93,130 @@ int main(int argv, char **args)
         }
         SDL_SetRenderDrawColor(renderer , 0 , 0 , 0 ,255);
         SDL_RenderClear(renderer);
-        SDL_RenderCopy(renderer , BackGround , NULL , NULL);
 
         if(mode == "login_menu")
         {
-            player.Draw(renderer,&mouth);
+            SDL_RenderCopy(renderer , stone_background , NULL , NULL);
+            if(mouthL)
+                mode = "game";
         }
-
-        handle_map_balls(count_ball , balls , balls_v , &ma);
-
-        for(int i = 0 ; i < count_ball ; i++)
+        else if(mode == "game")
         {
-            balls[i].Draw(renderer);            
-        }
+            bool is_ingame = true;
+            Player player;
+            player.creat(Cannon , screenWidth/2 , 300 , 200 , 80 , 40 , 40 );
+            map ma;
+            ma.tex = PathTex;
+            ma.p1 = {50,screenHeight-100};
+            ma.p2 = {screenWidth/2-200,screenHeight/2};
+            ma.p3 = {0,0};
+            ma.p4 = {screenWidth/4 ,100};
+            ma.p6 = {screenWidth,0};
+            ma.p5 = {screenWidth/2,200};
+            ma.p7 = {screenWidth-100 , screenHeight-100};
+            
+            SDL_SetRenderTarget(renderer , BackGround);
+            SDL_SetRenderDrawColor(renderer , 0 , 0 , 0 ,255);
+            SDL_RenderClear(renderer);
+            ma.draw_path(renderer);
+            SDL_SetRenderTarget(renderer , NULL);
 
+            int balls_width = 50;
+            Ball in_air_balls[20];
+            int in_air_count = 0;
+            int bullet_speed = 12;
 
+            int balls_v = 2;
+            int count_ball = 30;
+            Ball balls[200];
+            creat_start_balls(count_ball , balls , ma.total_lenght , balls_width , Red_marble , Green_marble , Blue_marble , Yellow_marble , Black_marble , Question_marble);
+            balls[29].current_loc = 800;
+            balls[29].leftConnnected = false;
+            balls[28].rightConnnected = false;
+            balls[28].current_loc = 560;
+            balls[27].current_loc = 510;
+            balls[27].leftConnnected = false;
+            balls[26].rightConnnected = false;
 
-        if((mouthL &&in_air_count==0 )|| (mouthL && bullet.is_in_cannon && in_air_count < 20 && bullet_shoot.get_current_time() > 600))
-        {
-            bullet.shoot(&mouth);
-            in_air_balls[in_air_count] = bullet;
-            bullet_shoot.creat();
-            in_air_count++;
+            Ball bullet;
             make_cannon_ball(count_ball , balls , &bullet ,  balls_width , bullet_speed , &player , Red_marble , Green_marble , Blue_marble , Yellow_marble);
-        }
+            Timer bullet_shoot;
 
-        bullet.update();
-        bullet.Draw(renderer);
-        int deleted_index = -1;
-
-        for(int i = 0 ; i < in_air_count;i++)
-        {
-            in_air_balls[i].update();
-            in_air_balls[i].Draw(renderer);
-            if(in_air_balls[i].is_out())
-                deleted_index = i;
-            for(int j = 0 ; j < count_ball ; j++)
+            while(is_ingame)
             {
-                if(check_ball_collision(&in_air_balls[i] , &balls[j]))
+                while (SDL_PollEvent(&event))
                 {
-                    collision(balls ,&count_ball ,j , &in_air_balls[i] , &ma , balls_v , balls_width);
-                    deleted_index = i;
-                    break;
+                    switch (event.type)
+                    {
+                    case SDL_QUIT:
+                        is_gameRunning = false;
+                        is_ingame = false;
+                        break;
+                    case SDL_MOUSEMOTION:
+                        SDL_GetMouseState(&mouth.x , &mouth.y);
+                        break;
+                    case SDL_MOUSEBUTTONDOWN:
+                        if(event.button.button == SDL_BUTTON_LEFT)
+                            mouthL = true;
+                        break;
+                    case SDL_MOUSEBUTTONUP:
+                        if(event.button.button == SDL_BUTTON_LEFT)
+                            mouthL = false;
+                        break;
+                    case SDL_KEYDOWN:
+                        if(event.key.keysym.sym == SDLK_q)
+                            is_gameRunning = false;
+                        break;
+                    }
                 }
+                SDL_SetRenderDrawColor(renderer , 0 , 0 , 0 ,255);
+                SDL_RenderClear(renderer);
+                SDL_RenderCopy(renderer , BackGround , NULL , NULL);
+                player.Draw(renderer , &mouth);
+                handle_map_balls(count_ball , balls , balls_v , &ma);  
+                for(int i = 0 ; i < count_ball ; i++)
+                {
+                    balls[i].Draw(renderer);            
+                }
+
+                if((mouthL &&in_air_count==0 )|| (mouthL && bullet.is_in_cannon && in_air_count < 20 && bullet_shoot.get_current_time() > 600))
+                {
+                    bullet.shoot(&mouth);
+                    in_air_balls[in_air_count] = bullet;
+                    bullet_shoot.creat();
+                    in_air_count++;
+                    make_cannon_ball(count_ball , balls , &bullet ,  balls_width , bullet_speed , &player , Red_marble , Green_marble , Blue_marble , Yellow_marble);
+                }
+
+                bullet.update();
+                bullet.Draw(renderer);
+                int deleted_index = -1;
+                for(int i = 0 ; i < in_air_count;i++)
+                {
+                    in_air_balls[i].update();
+                    in_air_balls[i].Draw(renderer);
+                    if(in_air_balls[i].is_out())
+                        deleted_index = i;
+                    for(int j = 0 ; j < count_ball ; j++)
+                    {
+                        if(check_ball_collision(&in_air_balls[i] , &balls[j]))
+                        {
+                            collision(balls ,&count_ball ,j , &in_air_balls[i] , &ma , balls_v , balls_width);
+                            deleted_index = i;
+                            break;
+                        }
+                    }
+                }
+                if(deleted_index != -1)
+                {
+                    delete_ball(in_air_balls , in_air_count , deleted_index);
+                    in_air_count--;
+                }
+                SDL_RenderPresent(renderer);
+                frameTime = SDL_GetTicks() - frameStart;
+		        if (frameTime < frameDelay)
+                    SDL_Delay(frameDelay - frameTime);
             }
-        }
-        //cout<<count_ball<<endl;
-        if(deleted_index != -1)
-        {
-            delete_ball(in_air_balls , in_air_count , deleted_index);
-            in_air_count--;
         }
 
         SDL_RenderPresent(renderer);

@@ -11,6 +11,9 @@ struct Ball
     bool is_in_cannon = false, is_primary = false;
     double velocity, v_x, v_y, normal_v = 0;
     double angle;
+    bool is_entering = false;
+    double add_animation_distance;
+    SDL_Point Rcenter;
     void creat_cannon_ball(SDL_Texture *texture, string mode, Player *player, int width, int v)
     {
         velocity = v;
@@ -29,7 +32,6 @@ struct Ball
         v_x = cos(angle) * velocity;
         v_y = sin(angle) * velocity;
     }
-
     void creat(SDL_Texture *texture, string mode, int loc, int width, int path_lenght)
     {
         velocity = v_x = v_y = 0;
@@ -83,10 +85,10 @@ struct Ball
         }
     }
 };
-void creat_start_balls(int count_ball, Ball balls[], int path_tatal_lenght, int ball_width, SDL_Texture *Red_marble, SDL_Texture *Green_marble, SDL_Texture *Blue_marble, SDL_Texture *Yellow_marble)
+void creat_start_balls(int count_ball, Ball balls[], int path_tatal_lenght, int ball_width, SDL_Texture *Red_marble, SDL_Texture *Green_marble, SDL_Texture *Blue_marble, SDL_Texture *Yellow_marble , SDL_Texture *Black_marble , SDL_Texture *Question_marble )
 {
-    int count_of_ball_mode = 4;
-    int chances[] = {1, 1, 1, 1};
+    int count_of_ball_mode = 6;
+    int chances[] = {3, 3, 3, 3 , 1 ,1};
     for (int i = 0; i < count_ball; i++)
     {
         int mode = random(chances, count_of_ball_mode);
@@ -94,31 +96,41 @@ void creat_start_balls(int count_ball, Ball balls[], int path_tatal_lenght, int 
         {
         case RED:
             balls[i].creat(Red_marble, "Red", (count_ball * -ball_width) + i * ball_width, ball_width, path_tatal_lenght);
-            chances[RED] = 3;
-            for (int i = 0; i < count_of_ball_mode; i++)
+            chances[RED] = 8;
+            for (int i = 0; i < count_of_ball_mode - 2; i++)
                 if (i != RED)
-                    chances[i] = 1;
+                    chances[i] = 3;
             break;
         case GREEN:
             balls[i].creat(Green_marble, "Green", (count_ball * -ball_width) + i * ball_width, ball_width, path_tatal_lenght);
-            chances[GREEN] = 3;
-            for (int i = 0; i < count_of_ball_mode; i++)
+            chances[GREEN] = 8;
+            for (int i = 0; i < count_of_ball_mode - 2; i++)
                 if (i != GREEN)
-                    chances[i] = 1;
+                    chances[i] = 3;
             break;
         case BLUE:
             balls[i].creat(Blue_marble, "Blue", (count_ball * -ball_width) + i * ball_width, ball_width, path_tatal_lenght);
-            chances[BLUE] = 3;
-            for (int i = 0; i < count_of_ball_mode; i++)
+            chances[BLUE] = 8;
+            for (int i = 0; i < count_of_ball_mode - 2; i++)
                 if (i != BLUE)
-                    chances[i] = 1;
+                    chances[i] = 3;
             break;
         case YELLOW:
             balls[i].creat(Yellow_marble, "Yellow", (count_ball * -ball_width) + i * ball_width, ball_width, path_tatal_lenght);
-            chances[YELLOW] = 3;
-            for (int i = 0; i < count_of_ball_mode; i++)
+            chances[YELLOW] = 8;
+            for (int i = 0; i < count_of_ball_mode - 2; i++)
                 if (i != YELLOW)
-                    chances[i] = 1;
+                    chances[i] = 3;
+            break;
+        case Black:
+            balls[i].creat(Black_marble, "Black", (count_ball * -ball_width) + i * ball_width, ball_width, path_tatal_lenght);
+            for (int i = 0; i < count_of_ball_mode - 2; i++)
+                chances[i] = 3;
+            break;
+        case Question:
+            balls[i].creat(Question_marble, "Question", (count_ball * -ball_width) + i * ball_width, ball_width, path_tatal_lenght);
+            for (int i = 0; i < count_of_ball_mode - 2; i++)
+                chances[i] = 3;
             break;
         }
     }
@@ -351,6 +363,9 @@ void add_ball_collision(Ball balls[], int *count_ball, int b, Ball *bullet, bool
                 break;
         }
     }
+    bullet->is_entering = true;
+    // bullet->Rcenter = bullet->center;
+    // bullet->add_animation_distance = sqrt((bullet->Rcenter.x - bullet->center.x)*(bullet->Rcenter.x - bullet->center.x) + (bullet->Rcenter.y - bullet->center.y)*(bullet->Rcenter.y - bullet->center.y));
     for (int i = 0; i < count + 1; i++)
     {
         if (i < b)
@@ -366,11 +381,19 @@ void add_ball_collision(Ball balls[], int *count_ball, int b, Ball *bullet, bool
     }
     if (is_right)
     {
-        //temp[b+1] = *bullet;
+        temp[b+1].leftConnnected = true;
+        if(b+1 != count && temp[b+2].leftConnnected)
+            temp[b+1].rightConnnected = true;
+        else
+            temp[b+1].rightConnnected = false;
     }
     else
     {
-        //temp[b] = *bullet;
+        temp[b].rightConnnected = true;
+        if(b != 0 && temp[b-1].rightConnnected )
+            temp[b].leftConnnected = true;
+        else
+            temp[b].leftConnnected = false;
     }
     for (int i = 0; i < count + 1; i++)
         balls[i] = temp[i];
@@ -381,6 +404,12 @@ void collision(Ball balls[], int *count_ball, int b, Ball *bullet, map *ma, int 
     /* NOTE
         check for special balls
     */
+    if(balls[b].color == "Black")
+    {
+        delete_ball(balls , *count_ball , b);
+        *count_ball = *count_ball - 1;
+        return;
+    }
     bool is_right;
     double x1, y1, x2, y2;
     ma->get_point(ma->getT_distance(balls[b].current_loc + 15), nullptr, &x1, &y1);
