@@ -510,6 +510,46 @@ void collision(Ball balls[], int *count_ball, int b, Ball *bullet, map *ma, doub
     /* NOTE
         check for special balls
     */
+    if(bullet->color == "Bomb")
+    {
+        int count = 1;
+        int start=0 , end = (*count_ball)-1;
+        int andis[9];
+        andis[0] = b;
+        for(int i = b+1 ; i < b + 5 ; i++)
+        {
+            if(i < *count_ball && balls[i].leftConnnected)
+            {
+                andis[count++] = i;
+                end = i;
+            }
+            else
+                break;
+        }
+        for(int i = b-1 ; i > b - 5 ; i--)
+        {
+            if(i > -1 && balls[i].rightConnnected)
+            {
+                andis[count++] = i;
+                start = i;
+            }
+            else
+                break;
+        }
+
+        if(start - 1 >= 0)
+            balls[start-1].rightConnnected = false;
+        if(end + 1 < *count_ball)
+            balls[end + 1].leftConnnected = false;
+        
+        delete_ball(balls , *count_ball , -1 , andis , count);
+        *count_ball = (*count_ball) - (count);
+        return;
+    }
+    else if(bullet->color == "Rainbow")
+    {
+        
+    }
     if(balls[b].color == "Black")
     {
         delete_ball(balls , *count_ball , b);

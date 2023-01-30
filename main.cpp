@@ -20,7 +20,7 @@ enum ball_modes {RED , GREEN , BLUE , YELLOW , Black , Question};
 #include "map.hpp"
 #include "ball.hpp"
 #include "keyboard_handler.hpp"
-
+#include "button.hpp"
 
 int main(int argv, char **args)
 {
@@ -53,6 +53,12 @@ int main(int argv, char **args)
     SDL_Texture* stone_background = IMG_LoadTexture(renderer , "assest/stone_background.jpg");
     SDL_Texture* Cannon = IMG_LoadTexture(renderer , "assest/cannon.png");
     SDL_Texture* PathTex = IMG_LoadTexture(renderer , "assest/path2.png");
+    SDL_Texture* Bomb_power_button_norm = IMG_LoadTexture(renderer , "assest/change_norm.png");
+    SDL_Texture* Bomb_power_button_selected = IMG_LoadTexture(renderer , "assest/change_selected.png");
+    SDL_Texture* Rainbow_power_button_norm = IMG_LoadTexture(renderer , "assest/change_norm.png");
+    SDL_Texture* Rainbow_power_button_selected = IMG_LoadTexture(renderer , "assest/change_selected.png");
+    SDL_Texture* Bomb = IMG_LoadTexture(renderer , "assest/bomb.png");
+    SDL_Texture* Rainbow = IMG_LoadTexture(renderer , "assest/bomb.png");
 
     SDL_Texture* BackGround = SDL_CreateTexture(renderer , SDL_PIXELFORMAT_UNKNOWN , SDL_TEXTUREACCESS_TARGET , screenWidth , screenHeight);
     //SDL_SetRenderDrawColor( renderer, 0, 0,255, 0 );
@@ -146,6 +152,13 @@ int main(int argv, char **args)
             make_cannon_ball(count_ball , balls , &bullet ,  balls_width , bullet_speed , &player , Red_marble , Green_marble , Blue_marble , Yellow_marble);
             Ball bullet2;
             make_cannon_ball(count_ball , balls , &bullet2 ,  balls_width , bullet_speed , &player , Red_marble , Green_marble , Blue_marble , Yellow_marble);
+
+            Button bomb_power ;
+            bomb_power.create(Bomb_power_button_norm , Bomb_power_button_selected , screenWidth - 100 , screenHeight/2 - 100 , 70 , 50 , 300);
+
+            Button rainbow_pawer ;
+            rainbow_pawer.create(Rainbow_power_button_norm , Rainbow_power_button_selected , screenWidth - 100 , screenHeight/2 , 70 , 50 , 300);
+
             Timer bullet_shoot;
             Keyboard_handler game_keyboard;
             game_keyboard.delay = 500;
@@ -192,7 +205,7 @@ int main(int argv, char **args)
                     balls[i].Draw(renderer);
                 }
 
-                if((mouthL &&in_air_count==0 )|| (mouthL && bullet.is_in_cannon && in_air_count < 20 && bullet_shoot.get_current_time() > 600))
+                if(!bomb_power.is_inside(&mouth) && !rainbow_pawer.is_inside(&mouth) &&((mouthL &&in_air_count==0 )|| (mouthL && bullet.is_in_cannon && in_air_count < 20 && bullet_shoot.get_current_time() > 600)))
                 {
                     bullet.shoot(&mouth);
                     in_air_balls[in_air_count] = bullet;
@@ -236,6 +249,21 @@ int main(int argv, char **args)
                     delete_ball(in_air_balls , in_air_count , deleted_index);
                     in_air_count--;
                 }
+                bomb_power.Draw(renderer , &mouth);
+                rainbow_pawer.Draw(renderer , &mouth);
+
+                if(mouthL)
+                {
+                    if(bomb_power.is_clicked(&mouth))
+                    {
+                        bullet.creat_cannon_ball(Bomb , "Bomb" , &player , balls_width , bullet_speed);
+                    }
+                    if(rainbow_pawer.is_clicked(&mouth))
+                    {
+                        bullet.creat_cannon_ball(Rainbow , "Rainbow" , &player , balls_width , bullet_speed);
+                    }
+                }
+
                 SDL_RenderPresent(renderer);
                 frameTime = SDL_GetTicks() - frameStart;
 		        if (frameTime < frameDelay)
