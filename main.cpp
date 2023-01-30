@@ -43,6 +43,10 @@ int main(int argv, char **args)
     SDL_Texture* Green_marble = IMG_LoadTexture(renderer , "assest/green_marble.png");
     SDL_Texture* Blue_marble = IMG_LoadTexture(renderer , "assest/blue_marble.png");
     SDL_Texture* Yellow_marble = IMG_LoadTexture(renderer , "assest/yellow_marble.png");
+    SDL_Texture* Red_marble_ice = IMG_LoadTexture(renderer , "assest/red_marble_ice.png");
+    SDL_Texture* Green_marble_ice = IMG_LoadTexture(renderer , "assest/green_marble_ice.png");
+    SDL_Texture* Blue_marble_ice = IMG_LoadTexture(renderer , "assest/blue_marble_ice.png");
+    SDL_Texture* Yellow_marble_ice = IMG_LoadTexture(renderer , "assest/yellow_marble_ice.png");
     SDL_Texture* Black_marble = IMG_LoadTexture(renderer , "assest/black_marble.png");
     SDL_Texture* Question_marble = IMG_LoadTexture(renderer , "assest/question_marble.png");
     SDL_Texture* stone_background = IMG_LoadTexture(renderer , "assest/stone_background.jpg");
@@ -129,7 +133,7 @@ int main(int argv, char **args)
             int balls_v = 2;
             int count_ball = 30;
             Ball balls[200];
-            creat_start_balls(count_ball , balls , ma.total_lenght , balls_width , Red_marble , Green_marble , Blue_marble , Yellow_marble , Black_marble , Question_marble);
+            creat_start_balls(count_ball , balls , ma.total_lenght , balls_width , Red_marble , Green_marble , Blue_marble , Yellow_marble , Red_marble_ice , Green_marble_ice , Blue_marble_ice , Yellow_marble_ice , Black_marble , Question_marble);
             balls[29].current_loc = 800;
             balls[29].leftConnnected = false;
             balls[28].rightConnnected = false;
