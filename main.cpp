@@ -19,6 +19,7 @@ enum ball_modes {RED , GREEN , BLUE , YELLOW , Black , Question};
 #include "player.hpp"
 #include "map.hpp"
 #include "ball.hpp"
+#include "keyboard_handler.hpp"
 
 
 int main(int argv, char **args)
@@ -67,7 +68,6 @@ int main(int argv, char **args)
 	int frameTime;
     SDL_Point mouth;
     bool mouthL = false;
-
     while (is_gameRunning)
     {
         frameStart = SDL_GetTicks();
@@ -130,7 +130,7 @@ int main(int argv, char **args)
             int in_air_count = 0;
             int bullet_speed = 12;
 
-            int balls_v = 2;
+            double balls_v = 1;
             int count_ball = 30;
             Ball balls[200];
             creat_start_balls(count_ball , balls , ma.total_lenght , balls_width , Red_marble , Green_marble , Blue_marble , Yellow_marble , Red_marble_ice , Green_marble_ice , Blue_marble_ice , Yellow_marble_ice , Black_marble , Question_marble);
@@ -144,8 +144,11 @@ int main(int argv, char **args)
 
             Ball bullet;
             make_cannon_ball(count_ball , balls , &bullet ,  balls_width , bullet_speed , &player , Red_marble , Green_marble , Blue_marble , Yellow_marble);
+            Ball bullet2;
+            make_cannon_ball(count_ball , balls , &bullet2 ,  balls_width , bullet_speed , &player , Red_marble , Green_marble , Blue_marble , Yellow_marble);
             Timer bullet_shoot;
-
+            Keyboard_handler game_keyboard;
+            game_keyboard.delay = 500;
             while(is_ingame)
             {
                 while (SDL_PollEvent(&event))
@@ -169,7 +172,13 @@ int main(int argv, char **args)
                         break;
                     case SDL_KEYDOWN:
                         if(event.key.keysym.sym == SDLK_q)
+                        {
                             is_gameRunning = false;
+                            is_ingame = false;
+                        }
+                        game_keyboard.keydown(&event);
+                    case SDL_KEYUP:
+                        game_keyboard.keyup(&event);
                         break;
                     }
                 }
@@ -180,7 +189,7 @@ int main(int argv, char **args)
                 handle_map_balls(count_ball , balls , balls_v , &ma);  
                 for(int i = 0 ; i < count_ball ; i++)
                 {
-                    balls[i].Draw(renderer);            
+                    balls[i].Draw(renderer);
                 }
 
                 if((mouthL &&in_air_count==0 )|| (mouthL && bullet.is_in_cannon && in_air_count < 20 && bullet_shoot.get_current_time() > 600))
@@ -189,7 +198,8 @@ int main(int argv, char **args)
                     in_air_balls[in_air_count] = bullet;
                     bullet_shoot.creat();
                     in_air_count++;
-                    make_cannon_ball(count_ball , balls , &bullet ,  balls_width , bullet_speed , &player , Red_marble , Green_marble , Blue_marble , Yellow_marble);
+                    bullet = bullet2;
+                    make_cannon_ball(count_ball , balls , &bullet2 ,  balls_width , bullet_speed , &player , Red_marble , Green_marble , Blue_marble , Yellow_marble);
                 }
 
                 bullet.update();
@@ -209,6 +219,16 @@ int main(int argv, char **args)
                             deleted_index = i;
                             break;
                         }
+                    }
+                }
+                if(game_keyboard.get_current() != '!')
+                {
+                    if(game_keyboard.curruntK == ' ')
+                    {
+                        Ball temp;
+                        temp = bullet2;
+                        bullet2 = bullet;
+                        bullet = temp;
                     }
                 }
                 if(deleted_index != -1)

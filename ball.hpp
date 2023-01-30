@@ -46,7 +46,7 @@ struct Ball
         tex = texture;
         rect = {0, 0, width, width};
     }
-    void update(map *ma = nullptr, int v = 0)
+    void update(map *ma = nullptr, double v = 0)
     {
         if (is_primary == false)
         {
@@ -173,7 +173,7 @@ void creat_start_balls(int count_ball, Ball balls[], int path_tatal_lenght, int 
     balls[0].leftConnnected = false;
     balls[count_ball - 1].rightConnnected = false;
 }
-void handle_map_balls(int count_ball, Ball balls[], int balls_v, map *ma)
+void handle_map_balls(int count_ball, Ball balls[], double balls_v, map *ma)
 {
     bool is_connected = true;
     int last = 0;
@@ -236,7 +236,18 @@ void delete_ball(Ball balls[], int count_ball, int index = -1, int andises[] = N
 void make_cannon_ball(int count_ball, Ball balls[], Ball *bullet, int ball_width, int v, Player *player, SDL_Texture *Red_marble, SDL_Texture *Green_marble, SDL_Texture *Blue_marble, SDL_Texture *Yellow_marble)
 {
     int count_of_ball_mode = 4;
-    int chances[] = {1, 1, 1, 1};
+    int chances[] = {0, 0, 0, 0};
+    for(int i = 0 ; i < count_ball ; i++)
+    {
+        if(balls[i].color == "Red" && chances[RED] == 0)
+            chances[RED] = 1;
+        if(balls[i].color == "Green" && chances[GREEN] == 0)
+            chances[GREEN] = 1;
+        if(balls[i].color == "Blue" && chances[BLUE] == 0)
+            chances[BLUE] = 1;
+        if(balls[i].color == "Yellow" && chances[YELLOW] == 0)
+            chances[YELLOW] = 1;
+    }
     int mode = random(chances, count_of_ball_mode);
     switch (mode)
     {
@@ -261,7 +272,7 @@ bool check_ball_collision(Ball *b1, Ball *b2)
     else
         return false;
 }
-bool ball_collision_delete(Ball balls[], int *count_ball, int b, Ball *bullet, bool is_right, int ball_v)
+bool ball_collision_delete(Ball balls[], int *count_ball, int b, Ball *bullet, bool is_right, double ball_v)
 {
     if (bullet->color == balls[b].color || (is_right && balls[b].rightConnnected && b < *count_ball - 1 && balls[b + 1].color == bullet->color) || (!is_right && balls[b].leftConnnected && b != 0 && balls[b - 1].color == bullet->color))
     {
@@ -421,7 +432,7 @@ bool ball_collision_delete(Ball balls[], int *count_ball, int b, Ball *bullet, b
     else
         return false;
 }
-void add_ball_collision(Ball balls[], int *count_ball, int b, Ball *bullet, bool is_right, int ball_v, int ball_width)
+void add_ball_collision(Ball balls[], int *count_ball, int b, Ball *bullet, bool is_right, double ball_v, int ball_width)
 {
     //for(int i = 0 ; i < *count_ball ; i++)
     //    balls[i].current_loc+=ball_width;
@@ -448,10 +459,12 @@ void add_ball_collision(Ball balls[], int *count_ball, int b, Ball *bullet, bool
         bullet->creat(bullet->tex, bullet->color, balls[b].current_loc, ball_width, balls[b].total_path);
         for(int i = b ; i < count ; i++)
         {
-            if(balls[i].leftConnnected)
+            if(balls[i].rightConnnected)
                 balls[i].current_loc += ball_width;
-            else
+            else{
+                balls[i].current_loc += ball_width;
                 break;
+            }
         }
     }
     bullet->is_entering = true;
@@ -473,6 +486,7 @@ void add_ball_collision(Ball balls[], int *count_ball, int b, Ball *bullet, bool
     if (is_right)
     {
         temp[b+1].leftConnnected = true;
+        temp[b].rightConnnected = true;
         if(b+1 != count && temp[b+2].leftConnnected)
             temp[b+1].rightConnnected = true;
         else
@@ -481,6 +495,7 @@ void add_ball_collision(Ball balls[], int *count_ball, int b, Ball *bullet, bool
     else
     {
         temp[b].rightConnnected = true;
+        temp[b+1].leftConnnected = true;
         if(b != 0 && temp[b-1].rightConnnected )
             temp[b].leftConnnected = true;
         else
@@ -490,7 +505,7 @@ void add_ball_collision(Ball balls[], int *count_ball, int b, Ball *bullet, bool
         balls[i] = temp[i];
     *count_ball = count + 1;
 }
-void collision(Ball balls[], int *count_ball, int b, Ball *bullet, map *ma, int ball_v, int ball_width)
+void collision(Ball balls[], int *count_ball, int b, Ball *bullet, map *ma, double ball_v, int ball_width)
 {
     /* NOTE
         check for special balls
