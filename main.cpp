@@ -164,7 +164,7 @@ int main(int argv, char **args)
             Ball balls[200];
             creat_start_balls(count_ball, balls, ma.total_lenght, balls_width, Red_marble, Green_marble, Blue_marble, Yellow_marble, Red_marble_ice, Green_marble_ice, Blue_marble_ice, Yellow_marble_ice, Black_marble, Question_marble);
             balls[29].current_loc = 800;
-            balls[28].time_effect_mode = SLOWMO;
+            balls[28].time_effect_mode = REVERSE;
             balls[28].time_effect_timer.creat();
             balls[29].leftConnnected = false;
             balls[28].rightConnnected = false;
@@ -192,8 +192,10 @@ int main(int argv, char **args)
             
             Keyboard_handler game_keyboard;
             game_keyboard.delay = 500;
+            int time_effect_chance[4] = {20000 , 1 , 1 , 1};
             while (is_ingame)
             {
+                frameStart = SDL_GetTicks();
                 while (SDL_PollEvent(&event))
                 {
                     switch (event.type)
@@ -242,7 +244,7 @@ int main(int argv, char **args)
                     balls_v = 0;
                 else if (current_time_mode == REVERSE)
                     balls_v = -1 * normal_speed;
-                cout<<current_time_mode<<" ";
+                //cout<<current_time_mode<<" ";
                 handle_map_balls(count_ball, balls, balls_v, &ma);
                 for (int i = 0; i < count_ball; i++)
                 {
@@ -254,8 +256,18 @@ int main(int argv, char **args)
                         balls[i].Draw(renderer , true , Slowmo_power);
                     else if(balls[i].time_effect_mode == REVERSE)
                         balls[i].Draw(renderer , true , Reverse_power);
+                    if(balls[i].color == "Red" || balls[i].color == "Yellow" || balls[i].color == "Blue" || balls[i].color == "Green")
+                    {
+                        int timeE = random(time_effect_chance , 4);
+                        if(timeE != 0 )
+                        {
+                            balls[i].time_effect_mode = timeE;
+                            balls[i].time_effect_timer.creat();
+                        }
+                    }
+                    cout<<balls[i].leftConnnected<<balls[i].rightConnnected<<" ";
                 }
-
+                cout<<endl;
                 if (!bomb_power.is_inside(&mouth) && !rainbow_pawer.is_inside(&mouth) && !fireball_power.is_inside(&mouth) && ((mouthL && in_air_count == 0) || (mouthL && bullet.is_in_cannon && in_air_count < 20 && bullet_shoot.get_current_time() > 600)))
                 {
                     bullet.shoot(&mouth);

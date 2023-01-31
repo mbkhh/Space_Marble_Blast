@@ -53,10 +53,10 @@ struct Ball
     {
         if (is_primary == false)
         {
-            if(time_effect_mode != NONE)
-                if(time_effect_timer.get_current_time() > 6000)
+            if (time_effect_mode != NONE)
+                if (time_effect_timer.get_current_time() > 5000)
                     time_effect_mode = NONE;
-            
+
             if (current_loc > total_path)
                 current_loc = 0;
             current_loc += v;
@@ -84,23 +84,23 @@ struct Ball
             return true;
         return false;
     }
-    void Draw(SDL_Renderer *renderer , bool has_second_tex = false, SDL_Texture *secondtex = nullptr)
+    void Draw(SDL_Renderer *renderer, bool has_second_tex = false, SDL_Texture *secondtex = nullptr)
     {
         if (current_loc >= 0)
         {
             rect.x = center.x - rect.w / 2;
             rect.y = center.y - rect.w / 2;
             SDL_RenderCopy(renderer, tex, NULL, &rect);
-            if(has_second_tex)
+            if (has_second_tex)
                 SDL_RenderCopy(renderer, secondtex, NULL, &rect);
         }
     }
 };
-void creat_start_balls(int count_ball, Ball balls[], int path_tatal_lenght, int ball_width, SDL_Texture *Red_marble, SDL_Texture *Green_marble, SDL_Texture *Blue_marble, SDL_Texture *Yellow_marble , SDL_Texture *Red_marble_ice , SDL_Texture *Green_marble_ice , SDL_Texture *Blue_marble_ice , SDL_Texture *Yellow_marble_ice  , SDL_Texture *Black_marble , SDL_Texture *Question_marble )
+void creat_start_balls(int count_ball, Ball balls[], int path_tatal_lenght, int ball_width, SDL_Texture *Red_marble, SDL_Texture *Green_marble, SDL_Texture *Blue_marble, SDL_Texture *Yellow_marble, SDL_Texture *Red_marble_ice, SDL_Texture *Green_marble_ice, SDL_Texture *Blue_marble_ice, SDL_Texture *Yellow_marble_ice, SDL_Texture *Black_marble, SDL_Texture *Question_marble)
 {
     int count_of_ball_mode = 6;
-    int chances[] = {3, 3, 3, 3 , 1 ,1};
-    int ice_chance[] = {7 , 1};
+    int chances[] = {3, 3, 3, 3, 1, 1};
+    int ice_chance[] = {7, 1};
     int type;
     for (int i = 0; i < count_ball; i++)
     {
@@ -108,23 +108,23 @@ void creat_start_balls(int count_ball, Ball balls[], int path_tatal_lenght, int 
         switch (mode)
         {
         case RED:
-            type = random(ice_chance , 2);
-            if(type == 0)
+            type = random(ice_chance, 2);
+            if (type == 0)
                 balls[i].creat(Red_marble, "Red", (count_ball * -ball_width) + i * ball_width, ball_width, path_tatal_lenght);
             else
             {
                 balls[i].creat(Red_marble_ice, "Red", (count_ball * -ball_width) + i * ball_width, ball_width, path_tatal_lenght);
                 balls[i].is_ice = true;
                 balls[i].temptex = Red_marble;
-            }            
+            }
             chances[RED] = 8;
             for (int i = 0; i < count_of_ball_mode - 2; i++)
                 if (i != RED)
                     chances[i] = 3;
             break;
         case GREEN:
-            type = random(ice_chance , 2);
-            if(type == 0)
+            type = random(ice_chance, 2);
+            if (type == 0)
                 balls[i].creat(Green_marble, "Green", (count_ball * -ball_width) + i * ball_width, ball_width, path_tatal_lenght);
             else
             {
@@ -138,30 +138,30 @@ void creat_start_balls(int count_ball, Ball balls[], int path_tatal_lenght, int 
                     chances[i] = 3;
             break;
         case BLUE:
-            type = random(ice_chance , 2);
-            if(type == 0)
+            type = random(ice_chance, 2);
+            if (type == 0)
                 balls[i].creat(Blue_marble, "Blue", (count_ball * -ball_width) + i * ball_width, ball_width, path_tatal_lenght);
             else
             {
                 balls[i].creat(Blue_marble_ice, "Blue", (count_ball * -ball_width) + i * ball_width, ball_width, path_tatal_lenght);
                 balls[i].is_ice = true;
                 balls[i].temptex = Blue_marble;
-            }            
+            }
             chances[BLUE] = 8;
             for (int i = 0; i < count_of_ball_mode - 2; i++)
                 if (i != BLUE)
                     chances[i] = 3;
             break;
         case YELLOW:
-            type = random(ice_chance , 2);
-            if(type == 0)
+            type = random(ice_chance, 2);
+            if (type == 0)
                 balls[i].creat(Yellow_marble, "Yellow", (count_ball * -ball_width) + i * ball_width, ball_width, path_tatal_lenght);
             else
             {
                 balls[i].creat(Yellow_marble_ice, "Yellow", (count_ball * -ball_width) + i * ball_width, ball_width, path_tatal_lenght);
                 balls[i].is_ice = true;
                 balls[i].temptex = Yellow_marble;
-            }            
+            }
             chances[YELLOW] = 8;
             for (int i = 0; i < count_of_ball_mode - 2; i++)
                 if (i != YELLOW)
@@ -184,39 +184,76 @@ void creat_start_balls(int count_ball, Ball balls[], int path_tatal_lenght, int 
 }
 void handle_map_balls(int count_ball, Ball balls[], double balls_v, map *ma)
 {
-    bool is_connected = true;
-    int last = 0;
-    for (int i = 0; i < count_ball; i++)
+    if (balls_v >= 0)
     {
-        if (i == 0)
-            balls[i].update(ma, balls_v);
-        else if (balls[i].leftConnnected && is_connected)
+        bool is_connected = true;
+        int last = 0;
+        for (int i = 0; i < count_ball; i++)
         {
-            balls[i].update(ma, balls_v);
-            balls[i].current_loc = balls[i - 1].current_loc + balls[i].rect.w;
-            balls[i].normal_v = 0;
-            last = i;
-        }
-        else
-        {
-            if (balls[i].current_loc - balls[i].rect.w <= balls[i - 1].current_loc && last + 1 == i)
+            if (i == 0)
+                balls[i].update(ma, balls_v);
+            else if (balls[i].leftConnnected && is_connected)
             {
-                balls[i - 1].rightConnnected = true;
-                balls[i].leftConnnected = true;
-                is_connected = true;
-                int j = i;
-                while (j < count_ball && balls[j].rightConnnected)
-                    balls[j++].normal_v = 0;
+                balls[i].update(ma, balls_v);
+                balls[i].current_loc = balls[i - 1].current_loc + balls[i].rect.w;
+                balls[i].normal_v = 0;
+                last = i;
             }
             else
             {
-                balls[i].update(ma);
-                is_connected = false;
+                if (balls[i].current_loc - balls[i].rect.w <= balls[i - 1].current_loc && last + 1 == i)
+                {
+                    balls[i - 1].rightConnnected = true;
+                    balls[i].leftConnnected = true;
+                    is_connected = true;
+                    int j = i;
+                    while (j < count_ball && balls[j].rightConnnected)
+                        balls[j++].normal_v = 0;
+                }
+                else
+                {
+                    balls[i].update(ma);
+                    is_connected = false;
+                }
+            }
+        }
+    }
+    else
+    {
+        bool is_connected = true;
+        int last = count_ball - 1;
+        for (int i = count_ball - 1; i >= 0; i--)
+        {
+            if (i == count_ball - 1)
+                balls[i].update(ma, balls_v);
+            else if (balls[i].rightConnnected && is_connected)
+            {
+                balls[i].update(ma, balls_v);
+                balls[i].current_loc = balls[i + 1].current_loc - balls[i].rect.w;
+                balls[i].normal_v = 0;
+                last = i;
+            }
+            else
+            {
+                if (balls[i].current_loc + balls[i].rect.w >= balls[i + 1].current_loc && last - 1 == i)
+                {
+                    balls[i].rightConnnected = true;
+                    balls[i + 1].leftConnnected = true;
+                    is_connected = true;
+                    //int j = i;
+                    //while (j < count_ball && balls[j].rightConnnected)
+                    //    balls[j++].normal_v = 0;
+                }
+                else
+                {
+                    balls[i].update(ma);
+                    is_connected = false;
+                }
             }
         }
     }
 }
-void delete_ball(Ball balls[], int count_ball, int index = -1, int andises[] = NULL, int andis_count = -1 , int *current_time_mode = nullptr , Timer *time = nullptr)
+void delete_ball(Ball balls[], int count_ball, int index = -1, int andises[] = NULL, int andis_count = -1, int *current_time_mode = nullptr, Timer *time = nullptr)
 {
     int answer_count;
     if (index == -1)
@@ -239,22 +276,21 @@ void delete_ball(Ball balls[], int count_ball, int index = -1, int andises[] = N
         else if (index != i)
             ans[k++] = balls[i];
     }
-    if(current_time_mode != nullptr)
+    if (current_time_mode != nullptr)
     {
-        cout<<"endtedr";
         int mode = NONE;
-        if(index == -1)
+        if (index == -1)
         {
-            for(int i = 0 ; i < andis_count ; i++)
-                if(balls[andises[i]].time_effect_mode != NONE)
+            for (int i = 0; i < andis_count; i++)
+                if (balls[andises[i]].time_effect_mode != NONE)
                     mode = balls[andises[i]].time_effect_mode;
         }
         else
         {
-            if(balls[index].time_effect_mode != NONE)
+            if (balls[index].time_effect_mode != NONE)
                 mode = balls[index].time_effect_mode;
         }
-        if(mode != NONE)
+        if (mode != NONE)
         {
             *current_time_mode = mode;
             time->creat();
@@ -267,15 +303,15 @@ void make_cannon_ball(int count_ball, Ball balls[], Ball *bullet, int ball_width
 {
     int count_of_ball_mode = 4;
     int chances[] = {0, 0, 0, 0};
-    for(int i = 0 ; i < count_ball ; i++)
+    for (int i = 0; i < count_ball; i++)
     {
-        if(balls[i].color == "Red" && chances[RED] == 0)
+        if (balls[i].color == "Red" && chances[RED] == 0)
             chances[RED] = 1;
-        if(balls[i].color == "Green" && chances[GREEN] == 0)
+        if (balls[i].color == "Green" && chances[GREEN] == 0)
             chances[GREEN] = 1;
-        if(balls[i].color == "Blue" && chances[BLUE] == 0)
+        if (balls[i].color == "Blue" && chances[BLUE] == 0)
             chances[BLUE] = 1;
-        if(balls[i].color == "Yellow" && chances[YELLOW] == 0)
+        if (balls[i].color == "Yellow" && chances[YELLOW] == 0)
             chances[YELLOW] = 1;
     }
     int mode = random(chances, count_of_ball_mode);
@@ -302,7 +338,7 @@ bool check_ball_collision(Ball *b1, Ball *b2)
     else
         return false;
 }
-bool ball_collision_delete(Ball balls[], int *count_ball, int b, Ball *bullet, bool is_right, double ball_v , int *current_time_mode , Timer *time )
+bool ball_collision_delete(Ball balls[], int *count_ball, int b, Ball *bullet, bool is_right, double ball_v, int *current_time_mode, Timer *time)
 {
     if (bullet->color == balls[b].color || (is_right && balls[b].rightConnnected && b < *count_ball - 1 && balls[b + 1].color == bullet->color) || (!is_right && balls[b].leftConnnected && b != 0 && balls[b - 1].color == bullet->color))
     {
@@ -326,23 +362,23 @@ bool ball_collision_delete(Ball balls[], int *count_ball, int b, Ball *bullet, b
             max_left = b;
             for (int i = b; i >= 0; i--)
             {
-                if(balls[i].color == "Question")
+                if (balls[i].color == "Question")
                 {
-                    balls[i].color = balls[i+1].color;
-                    balls[i].tex = balls[i+1].tex;
+                    balls[i].color = balls[i + 1].color;
+                    balls[i].tex = balls[i + 1].tex;
                     break;
                 }
-                if(balls[i].color == bullet->color && !balls[i].is_ice)
+                if (balls[i].color == bullet->color && !balls[i].is_ice)
                 {
                     deleted[deleted_count++] = i;
                     max_left--;
                 }
-                else if(balls[i].is_ice)
+                else if (balls[i].is_ice)
                 {
                     balls[i].is_ice = false;
                     balls[i].tex = balls[i].temptex;
                     break;
-                }                
+                }
                 else
                     break;
                 if (!balls[i].leftConnnected)
@@ -352,10 +388,10 @@ bool ball_collision_delete(Ball balls[], int *count_ball, int b, Ball *bullet, b
             {
                 for (int i = b + 1; i < *count_ball; i++)
                 {
-                    if(balls[i].color == "Question")
+                    if (balls[i].color == "Question")
                     {
-                        balls[i].color = balls[i-1].color;
-                        balls[i].tex = balls[i-1].tex;
+                        balls[i].color = balls[i - 1].color;
+                        balls[i].tex = balls[i - 1].tex;
                         break;
                     }
                     if (balls[i].color == bullet->color && !balls[i].is_ice)
@@ -363,7 +399,7 @@ bool ball_collision_delete(Ball balls[], int *count_ball, int b, Ball *bullet, b
                         deleted[deleted_count++] = i;
                         max_right++;
                     }
-                    else if(balls[i].is_ice)
+                    else if (balls[i].is_ice)
                     {
                         balls[i].is_ice = false;
                         balls[i].tex = balls[i].temptex;
@@ -382,10 +418,10 @@ bool ball_collision_delete(Ball balls[], int *count_ball, int b, Ball *bullet, b
             max_left = b - 1;
             for (int i = b; i < *count_ball; i++)
             {
-                if(balls[i].color == "Question")
+                if (balls[i].color == "Question")
                 {
-                    balls[i].color = balls[i-1].color;
-                    balls[i].tex = balls[i-1].tex;
+                    balls[i].color = balls[i - 1].color;
+                    balls[i].tex = balls[i - 1].tex;
                     break;
                 }
                 if (balls[i].color == bullet->color && !balls[i].is_ice)
@@ -393,7 +429,7 @@ bool ball_collision_delete(Ball balls[], int *count_ball, int b, Ball *bullet, b
                     deleted[deleted_count++] = i;
                     max_right++;
                 }
-                else if(balls[i].is_ice)
+                else if (balls[i].is_ice)
                 {
                     balls[i].is_ice = false;
                     balls[i].tex = balls[i].temptex;
@@ -408,10 +444,10 @@ bool ball_collision_delete(Ball balls[], int *count_ball, int b, Ball *bullet, b
             {
                 for (int i = b - 1; i >= 0; i--)
                 {
-                    if(balls[i].color == "Question")
+                    if (balls[i].color == "Question")
                     {
-                        balls[i].color = balls[i+1].color;
-                        balls[i].tex = balls[i+1].tex;
+                        balls[i].color = balls[i + 1].color;
+                        balls[i].tex = balls[i + 1].tex;
                         break;
                     }
                     if (balls[i].color == bullet->color && !balls[i].is_ice)
@@ -419,7 +455,7 @@ bool ball_collision_delete(Ball balls[], int *count_ball, int b, Ball *bullet, b
                         deleted[deleted_count++] = i;
                         max_left--;
                     }
-                    else if(balls[i].is_ice)
+                    else if (balls[i].is_ice)
                     {
                         balls[i].is_ice = false;
                         balls[i].tex = balls[i].temptex;
@@ -432,8 +468,8 @@ bool ball_collision_delete(Ball balls[], int *count_ball, int b, Ball *bullet, b
                 }
             }
         }
-        
-        if(deleted_count >1)
+
+        if (deleted_count > 1)
         {
             if (max_right < *count_ball)
                 balls[max_right].leftConnnected = false;
@@ -451,13 +487,12 @@ bool ball_collision_delete(Ball balls[], int *count_ball, int b, Ball *bullet, b
                     }
                 }
             }
-            delete_ball(balls, *count_ball, -1, deleted, deleted_count , current_time_mode , time);
+            delete_ball(balls, *count_ball, -1, deleted, deleted_count, current_time_mode, time);
             *count_ball -= deleted_count;
             return true;
         }
         else
             return false;
-        
     }
     else
         return false;
@@ -472,12 +507,12 @@ void add_ball_collision(Ball balls[], int *count_ball, int b, Ball *bullet, bool
     Ball temp[count + 1];
     if (is_right)
     {
-        bullet->creat(bullet->tex, bullet->color, balls[b].current_loc+ball_width, ball_width, balls[b].total_path);
-        if(b+1 != count) // b not at the end
+        bullet->creat(bullet->tex, bullet->color, balls[b].current_loc + ball_width, ball_width, balls[b].total_path);
+        if (b + 1 != count) // b not at the end
         {
-            for(int i = b+1 ; i < count ; i++)
+            for (int i = b + 1; i < count; i++)
             {
-                if(balls[i].leftConnnected)
+                if (balls[i].leftConnnected)
                     balls[i].current_loc += ball_width;
                 else
                     break;
@@ -487,11 +522,12 @@ void add_ball_collision(Ball balls[], int *count_ball, int b, Ball *bullet, bool
     else
     {
         bullet->creat(bullet->tex, bullet->color, balls[b].current_loc, ball_width, balls[b].total_path);
-        for(int i = b ; i < count ; i++)
+        for (int i = b; i < count; i++)
         {
-            if(balls[i].rightConnnected)
+            if (balls[i].rightConnnected)
                 balls[i].current_loc += ball_width;
-            else{
+            else
+            {
                 balls[i].current_loc += ball_width;
                 break;
             }
@@ -515,18 +551,18 @@ void add_ball_collision(Ball balls[], int *count_ball, int b, Ball *bullet, bool
     }
     if (is_right)
     {
-        temp[b+1].leftConnnected = true;
+        temp[b + 1].leftConnnected = true;
         temp[b].rightConnnected = true;
-        if(b+1 != count && temp[b+2].leftConnnected)
-            temp[b+1].rightConnnected = true;
+        if (b + 1 != count && temp[b + 2].leftConnnected)
+            temp[b + 1].rightConnnected = true;
         else
-            temp[b+1].rightConnnected = false;
+            temp[b + 1].rightConnnected = false;
     }
     else
     {
         temp[b].rightConnnected = true;
-        temp[b+1].leftConnnected = true;
-        if(b != 0 && temp[b-1].rightConnnected )
+        temp[b + 1].leftConnnected = true;
+        if (b != 0 && temp[b - 1].rightConnnected)
             temp[b].leftConnnected = true;
         else
             temp[b].leftConnnected = false;
@@ -535,20 +571,20 @@ void add_ball_collision(Ball balls[], int *count_ball, int b, Ball *bullet, bool
         balls[i] = temp[i];
     *count_ball = count + 1;
 }
-void collision(Ball balls[], int *count_ball, int b, Ball *bullet, map *ma, double ball_v, int ball_width , int *current_time_mode , Timer *time)
+void collision(Ball balls[], int *count_ball, int b, Ball *bullet, map *ma, double ball_v, int ball_width, int *current_time_mode, Timer *time)
 {
     /* NOTE
         check for special balls
     */
-    if(bullet->color == "Bomb")
+    if (bullet->color == "Bomb")
     {
         int count = 1;
-        int start=0 , end = (*count_ball)-1;
+        int start = 0, end = (*count_ball) - 1;
         int andis[9];
         andis[0] = b;
-        for(int i = b+1 ; i < b + 5 ; i++)
+        for (int i = b + 1; i < b + 5; i++)
         {
-            if(i < *count_ball && balls[i].leftConnnected)
+            if (i < *count_ball && balls[i].leftConnnected)
             {
                 andis[count++] = i;
                 end = i;
@@ -556,9 +592,9 @@ void collision(Ball balls[], int *count_ball, int b, Ball *bullet, map *ma, doub
             else
                 break;
         }
-        for(int i = b-1 ; i > b - 5 ; i--)
+        for (int i = b - 1; i > b - 5; i--)
         {
-            if(i > -1 && balls[i].rightConnnected)
+            if (i > -1 && balls[i].rightConnnected)
             {
                 andis[count++] = i;
                 start = i;
@@ -567,57 +603,61 @@ void collision(Ball balls[], int *count_ball, int b, Ball *bullet, map *ma, doub
                 break;
         }
 
-        if(start - 1 >= 0)
-            balls[start-1].rightConnnected = false;
-        if(end + 1 < *count_ball)
+        if (start - 1 >= 0)
+            balls[start - 1].rightConnnected = false;
+        if (end + 1 < *count_ball)
             balls[end + 1].leftConnnected = false;
-        
-        delete_ball(balls , *count_ball , -1 , andis , count , current_time_mode , time);
+
+        delete_ball(balls, *count_ball, -1, andis, count, current_time_mode, time);
         *count_ball = (*count_ball) - (count);
         return;
     }
-    else if(bullet->color == "Rainbow")
+    else if (bullet->color == "Rainbow")
     {
-        if(balls[b].color == "Red" || balls[b].color == "Blue" || balls[b].color == "Yellow" || balls[b].color == "Green")
+        if (balls[b].color == "Red" || balls[b].color == "Blue" || balls[b].color == "Yellow" || balls[b].color == "Green")
         {
             int andis[100];
-            int count = 0 ;
-            for(int i = 0 ; i < *count_ball ; i++)
+            int count = 0;
+            for (int i = 0; i < *count_ball; i++)
             {
-                if(balls[i].color == balls[b].color)
+                if (balls[i].color == balls[b].color)
                 {
                     andis[count++] = i;
-                    if(i>0)
-                        balls[i-1].rightConnnected = false;
-                    if(i+1 < *count_ball)
-                        balls[i+1].leftConnnected = false;
+                    if (i > 0)
+                        balls[i - 1].rightConnnected = false;
+                    if (i + 1 < *count_ball)
+                        balls[i + 1].leftConnnected = false;
                 }
             }
-            delete_ball(balls , *count_ball , -1 , andis , count , current_time_mode , time);
+            delete_ball(balls, *count_ball, -1, andis, count, current_time_mode, time);
             *count_ball = (*count_ball) - (count);
         }
         return;
     }
-    else if(bullet->color == "Fireball")
+    else if (bullet->color == "Fireball")
     {
-        if(balls[b].color == "Red" || balls[b].color == "Blue" || balls[b].color == "Yellow" || balls[b].color == "Green" || balls[b].color == "Black" || balls[b].color == "Question")
+        if (balls[b].color == "Red" || balls[b].color == "Blue" || balls[b].color == "Yellow" || balls[b].color == "Green" || balls[b].color == "Black" || balls[b].color == "Question")
         {
-            if(b>0)
-                balls[b-1].rightConnnected = false;
-            if(b+1 < *count_ball)
-                balls[b+1].leftConnnected = false;
-            delete_ball(balls , *count_ball , b , NULL , -1 , current_time_mode , time);
+            if (b > 0)
+                balls[b - 1].rightConnnected = false;
+            if (b + 1 < *count_ball)
+                balls[b + 1].leftConnnected = false;
+            delete_ball(balls, *count_ball, b, NULL, -1, current_time_mode, time);
             *count_ball -= 1;
         }
         return;
     }
-    if(balls[b].color == "Black")
+    if (balls[b].color == "Black")
     {
-        delete_ball(balls , *count_ball , b);
-        *count_ball = *count_ball - 1;
+        if (b > 0)
+            balls[b - 1].rightConnnected = false;
+        if (b + 1 < *count_ball)
+            balls[b + 1].leftConnnected = false;
+        delete_ball(balls, *count_ball, b);
+        *count_ball -= 1;
         return;
     }
-    else if(balls[b].is_ice)
+    else if (balls[b].is_ice)
     {
         balls[b].is_ice = false;
         balls[b].tex = balls[b].temptex;
@@ -632,7 +672,7 @@ void collision(Ball balls[], int *count_ball, int b, Ball *bullet, map *ma, doub
         is_right = false;
     else
         is_right = true;
-    if (!ball_collision_delete(balls, count_ball, b, bullet, is_right, ball_v , current_time_mode , time))
+    if (!ball_collision_delete(balls, count_ball, b, bullet, is_right, ball_v, current_time_mode, time))
     {
         add_ball_collision(balls, count_ball, b, bullet, is_right, ball_v, ball_width);
     }

@@ -7,6 +7,6 @@ struct Timer
     }
     int get_current_time()
     {
-        return  SDL_GetTicks() - start;
+        return SDL_GetTicks() - start;
     }
 };

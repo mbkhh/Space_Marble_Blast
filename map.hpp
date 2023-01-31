@@ -29,25 +29,25 @@ struct map
             *y2 = Y;
         }
     }
-    int getT_distance(double distance , int lastT = 0)
+    int getT_distance(double distance, int lastT = 0)
     {
-        if(lastT < 0)
+        if (lastT < 0)
             lastT = 0;
-        for(int i = lastT ; i < 1999 ;i++)
-            if(distance >= distance_samples[i] && distance < distance_samples[i+1])
+        for (int i = lastT; i < 1999; i++)
+            if (distance >= distance_samples[i] && distance < distance_samples[i + 1])
                 return i;
         return -1;
     }
-    void draw_path(SDL_Renderer *renderer , bool draw_base = false)
+    void draw_path(SDL_Renderer *renderer, bool draw_base = false)
     {
         int t = 1;
         SDL_SetRenderDrawColor(renderer, 255, 0, 0, 0);
-        SDL_Point p,p_last = p1;
+        SDL_Point p, p_last = p1;
         SDL_Rect dst = {0, 0, 4, 60};
         double x1, x2, y1, y2;
         x1 = p_last.x;
         y1 = p_last.y;
-        distance_samples[0]=0;
+        distance_samples[0] = 0;
         while (t < 2000)
         {
             get_point(t, &p, &x2, &y2);
@@ -57,7 +57,7 @@ struct map
             total_lenght += sqrt((y2 - y1) * (y2 - y1) + (x2 - x1) * (x2 - x1));
             distance_samples[t] = total_lenght;
             SDL_RenderCopyEx(renderer, tex, NULL, &dst, (atan2((double)(y2 - y1), (double)(x2 - x1)) * 180) / M_PI, NULL, SDL_FLIP_NONE);
-            if(draw_base)
+            if (draw_base)
                 SDL_RenderDrawPoint(renderer, p.x, p.y);
             p_last = p;
             x1 = x2;
