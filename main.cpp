@@ -47,6 +47,11 @@ void end_game(string game_mode, int score, Timer *game_timer, int *point, int *p
         *point = 100 * score;
         *point += 50 * (3 * 60 - (game_timer->last / 1000));
     }
+    else if(game_mode == "stone")
+    {
+        *point = 1000 * score;
+        *point += 50 * (3 * 60 - (game_timer->last / 1000));
+    }
 }
 
 int main(int argv, char **args)
@@ -108,7 +113,7 @@ int main(int argv, char **args)
     //SDL_RenderClear( renderer );
 
     string mode = "login_menu";
-    string game_mode = "timer";
+    string game_mode = "stone";
     SDL_Rect fullScreen = {0, 0, screenWidth, screenHeight};
 
     bool is_gameRunning = true;
@@ -166,6 +171,8 @@ int main(int argv, char **args)
             SDL_RenderCopy(renderer, stone_background, NULL, NULL);
             if (mouthL)
                 mode = "game";
+            //int t[10];
+            //random_array(t , 10 , 0 , 80);
             // int en = 0;
             // char name[30];
             // SDL_StartTextInput();
@@ -346,6 +353,7 @@ int main(int argv, char **args)
             SDL_SetRenderTarget(renderer, BackGround);
             SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
             SDL_RenderClear(renderer);
+            SDL_RenderCopy(renderer, stone_background, NULL, NULL);
             ma.draw_path(renderer);
             SDL_SetRenderTarget(renderer, NULL);
 
@@ -357,9 +365,9 @@ int main(int argv, char **args)
 
             double normal_speed = 1;
             double balls_v = 1;
-            int count_ball = 30;
+            int count_ball = 80;
             Ball balls[200];
-            creat_start_balls(count_ball, balls, ma.total_lenght, balls_width, Red_marble, Green_marble, Blue_marble, Yellow_marble, Red_marble_ice, Green_marble_ice, Blue_marble_ice, Yellow_marble_ice, Black_marble, Question_marble);
+            creat_start_balls(count_ball, balls, ma.total_lenght, balls_width , game_mode , Red_marble, Green_marble, Blue_marble, Yellow_marble, Red_marble_ice, Green_marble_ice, Blue_marble_ice, Yellow_marble_ice, Black_marble, Question_marble , Stone_marble);
             //balls[29].current_loc = 800;
             //balls[28].time_effect_mode = REVERSE;
             //balls[28].time_effect_timer.creat();
@@ -475,20 +483,29 @@ int main(int argv, char **args)
                             balls[i].time_effect_timer.creat();
                         }
                     }
-                    if (game_mode == "normal" || game_mode == "timer")
+                    if (balls[i].current_loc > ma.total_lenght && balls[i].color != "Stone")
                     {
-                        if (balls[i].current_loc > ma.total_lenght)
-                        {
-                            is_ingame = false;
-                            mode = "end_game";
-                            end_game(game_mode, score, &game_timer, &point, &prize);
-                        }
+                        is_ingame = false;
+                        mode = "end_game";
+                        end_game(game_mode, score, &game_timer, &point, &prize);
+                    }
+
+                    if(balls[i].color == "Stone" && i + 1 == count_ball && balls[i].normal_v == 0)
+                    {
+                        balls[i].normal_v = 11;
+                        balls[i].current_loc += 10;
+                        balls[i].leftConnnected = false;
+                    }
+                    if(balls[i].current_loc > ma.total_lenght && balls[i].color == "Stone")
+                    {
+                        count_ball--;
+                        score++;
                     }
                     //cout<<balls[i].leftConnnected<<balls[i].rightConnnected<<" ";
                     // cout<<balls[i].current_loc<<" ";
                 }
                 //cout<<endl;
-                if (game_mode == "normal" || game_mode == "timer")
+                if (game_mode == "normal" || game_mode == "timer" || game_mode == "stone")
                 {
                     if (count_ball == 0)
                     {
@@ -496,6 +513,12 @@ int main(int argv, char **args)
                         mode = "end_game";
                         end_game(game_mode, score, &game_timer, &point, &prize);
                     }
+                }
+                if(game_mode == "stone" && score == 10)
+                {
+                    is_ingame = false;
+                    mode = "end_game";
+                    end_game(game_mode, score, &game_timer, &point, &prize);
                 }
                 if ((max_timer_mode_lenght - (game_timer.get_current_time() - game_timer.start)) <= 0)
                 {
@@ -527,7 +550,7 @@ int main(int argv, char **args)
                     {
                         if (check_ball_collision(&in_air_balls[i], &balls[j]))
                         {
-                            collision(balls, &count_ball, j, &in_air_balls[i], &ma, balls_v, balls_width, &current_time_mode, &time_effect_timer, &score);
+                            collision(balls, &count_ball, j, &in_air_balls[i], &ma, balls_v, balls_width, &current_time_mode, &time_effect_timer, &score , game_mode);
                             deleted_index = i;
                             break;
                         }
