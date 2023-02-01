@@ -47,6 +47,7 @@ struct Ball
         normal_v = 0;
         color = mode;
         tex = texture;
+        lastT = 0;
         rect = {0, 0, width, width};
     }
     void update(map *ma = nullptr, double v = 0)
@@ -314,6 +315,8 @@ void make_cannon_ball(int count_ball, Ball balls[], Ball *bullet, int ball_width
         if (balls[i].color == "Yellow" && chances[YELLOW] == 0)
             chances[YELLOW] = 1;
     }
+    if(chances[0] == 0 && chances[1] == 0 && chances[2] == 0 && chances[3] == 0 )
+        chances[0] = 1;
     int mode = random(chances, count_of_ball_mode);
     switch (mode)
     {
@@ -338,7 +341,7 @@ bool check_ball_collision(Ball *b1, Ball *b2)
     else
         return false;
 }
-bool ball_collision_delete(Ball balls[], int *count_ball, int b, Ball *bullet, bool is_right, double ball_v, int *current_time_mode, Timer *time)
+bool ball_collision_delete(Ball balls[], int *count_ball, int b, Ball *bullet, bool is_right, double ball_v, int *current_time_mode, Timer *time , int *score)
 {
     if (bullet->color == balls[b].color || (is_right && balls[b].rightConnnected && b < *count_ball - 1 && balls[b + 1].color == bullet->color) || (!is_right && balls[b].leftConnnected && b != 0 && balls[b - 1].color == bullet->color))
     {
@@ -489,6 +492,7 @@ bool ball_collision_delete(Ball balls[], int *count_ball, int b, Ball *bullet, b
             }
             delete_ball(balls, *count_ball, -1, deleted, deleted_count, current_time_mode, time);
             *count_ball -= deleted_count;
+            *score += deleted_count;
             return true;
         }
         else
@@ -571,7 +575,7 @@ void add_ball_collision(Ball balls[], int *count_ball, int b, Ball *bullet, bool
         balls[i] = temp[i];
     *count_ball = count + 1;
 }
-void collision(Ball balls[], int *count_ball, int b, Ball *bullet, map *ma, double ball_v, int ball_width, int *current_time_mode, Timer *time)
+void collision(Ball balls[], int *count_ball, int b, Ball *bullet, map *ma, double ball_v, int ball_width, int *current_time_mode, Timer *time , int *score)
 {
     /* NOTE
         check for special balls
@@ -610,6 +614,7 @@ void collision(Ball balls[], int *count_ball, int b, Ball *bullet, map *ma, doub
 
         delete_ball(balls, *count_ball, -1, andis, count, current_time_mode, time);
         *count_ball = (*count_ball) - (count);
+        *score  += count;
         return;
     }
     else if (bullet->color == "Rainbow")
@@ -631,6 +636,7 @@ void collision(Ball balls[], int *count_ball, int b, Ball *bullet, map *ma, doub
             }
             delete_ball(balls, *count_ball, -1, andis, count, current_time_mode, time);
             *count_ball = (*count_ball) - (count);
+            *score  += count;
         }
         return;
     }
@@ -644,6 +650,7 @@ void collision(Ball balls[], int *count_ball, int b, Ball *bullet, map *ma, doub
                 balls[b + 1].leftConnnected = false;
             delete_ball(balls, *count_ball, b, NULL, -1, current_time_mode, time);
             *count_ball -= 1;
+            *score  += 1;
         }
         return;
     }
@@ -655,6 +662,7 @@ void collision(Ball balls[], int *count_ball, int b, Ball *bullet, map *ma, doub
             balls[b + 1].leftConnnected = false;
         delete_ball(balls, *count_ball, b);
         *count_ball -= 1;
+        *score  += 1;
         return;
     }
     else if (balls[b].is_ice)
@@ -672,7 +680,7 @@ void collision(Ball balls[], int *count_ball, int b, Ball *bullet, map *ma, doub
         is_right = false;
     else
         is_right = true;
-    if (!ball_collision_delete(balls, count_ball, b, bullet, is_right, ball_v, current_time_mode, time))
+    if (!ball_collision_delete(balls, count_ball, b, bullet, is_right, ball_v, current_time_mode, time , score))
     {
         add_ball_collision(balls, count_ball, b, bullet, is_right, ball_v, ball_width);
     }

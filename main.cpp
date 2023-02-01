@@ -37,6 +37,18 @@ enum time_modes
 #include "keyboard_handler.hpp"
 #include "button.hpp"
 
+void end_game(string game_mode, int score, Timer *game_timer, int *point, int *prize)
+{
+    game_timer->end();
+    int prize_chances[5] = {5, 4, 3, 2, 1};
+    *prize = random(prize_chances, 5);
+    if (game_mode == "normal" || game_mode == "timer")
+    {
+        *point = 100 * score;
+        *point += 50 * (3 * 60 - (game_timer->last / 1000));
+    }
+}
+
 int main(int argv, char **args)
 {
     srand(time(NULL));
@@ -54,7 +66,6 @@ int main(int argv, char **args)
         std::cout << "SDL fail to create renderer . error : " << SDL_GetError() << std::endl;
 
     //Load resources
-    //SDL_Texture* stone_background = IMG_LoadTexture(renderer , "assest/stone_background.jpg");
     SDL_Texture *Red_marble = IMG_LoadTexture(renderer, "assest/red_marble.png");
     SDL_Texture *Green_marble = IMG_LoadTexture(renderer, "assest/green_marble.png");
     SDL_Texture *Blue_marble = IMG_LoadTexture(renderer, "assest/blue_marble.png");
@@ -65,6 +76,7 @@ int main(int argv, char **args)
     SDL_Texture *Yellow_marble_ice = IMG_LoadTexture(renderer, "assest/yellow_marble_ice.png");
     SDL_Texture *Black_marble = IMG_LoadTexture(renderer, "assest/black_marble.png");
     SDL_Texture *Question_marble = IMG_LoadTexture(renderer, "assest/question_marble.png");
+    SDL_Texture *Stone_marble = IMG_LoadTexture(renderer, "assest/stone_marble.png");
     SDL_Texture *stone_background = IMG_LoadTexture(renderer, "assest/stone_background.jpg");
     SDL_Texture *Cannon = IMG_LoadTexture(renderer, "assest/cannon.png");
     SDL_Texture *PathTex = IMG_LoadTexture(renderer, "assest/path2.png");
@@ -74,6 +86,14 @@ int main(int argv, char **args)
     SDL_Texture *Rainbow_power_button_selected = IMG_LoadTexture(renderer, "assest/change_selected.png");
     SDL_Texture *Fireball_power_button_norm = IMG_LoadTexture(renderer, "assest/change_norm.png");
     SDL_Texture *Fireball_power_button_selected = IMG_LoadTexture(renderer, "assest/change_selected.png");
+    SDL_Texture *Quit_button_norm = IMG_LoadTexture(renderer, "assest/change_norm.png");
+    SDL_Texture *Quit_button_selected = IMG_LoadTexture(renderer, "assest/change_selected.png");
+    SDL_Texture *Leaderboard_button_norm = IMG_LoadTexture(renderer, "assest/change_norm.png");
+    SDL_Texture *Leaderboard_button_selected = IMG_LoadTexture(renderer, "assest/change_selected.png");
+    SDL_Texture *Tryagain_button_norm = IMG_LoadTexture(renderer, "assest/change_norm.png");
+    SDL_Texture *Tryagain_button_selected = IMG_LoadTexture(renderer, "assest/change_selected.png");
+    SDL_Texture *Choose_mode_button_norm = IMG_LoadTexture(renderer, "assest/change_norm.png");
+    SDL_Texture *Choose_mode_button_selected = IMG_LoadTexture(renderer, "assest/change_selected.png");
     SDL_Texture *Bomb = IMG_LoadTexture(renderer, "assest/bomb.png");
     SDL_Texture *Rainbow = IMG_LoadTexture(renderer, "assest/bomb.png");
     SDL_Texture *Fireball = IMG_LoadTexture(renderer, "assest/bomb.png");
@@ -81,15 +101,14 @@ int main(int argv, char **args)
     SDL_Texture *Stop_power = IMG_LoadTexture(renderer, "assest/pause_power.png");
     SDL_Texture *Reverse_power = IMG_LoadTexture(renderer, "assest/reverse_power.png");
 
-    TTF_Font* arial_font;
-    arial_font = TTF_OpenFont("assest/arial.ttf", 24);
+    TTF_Font *arial_font = TTF_OpenFont("assest/arial.ttf", 24);
 
     SDL_Texture *BackGround = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_UNKNOWN, SDL_TEXTUREACCESS_TARGET, screenWidth, screenHeight);
     //SDL_SetRenderDrawColor( renderer, 0, 0,255, 0 );
     //SDL_RenderClear( renderer );
 
     string mode = "login_menu";
-    string game_mode = "normal";
+    string game_mode = "timer";
     SDL_Rect fullScreen = {0, 0, screenWidth, screenHeight};
 
     bool is_gameRunning = true;
@@ -99,8 +118,19 @@ int main(int argv, char **args)
     SDL_Point mouth;
     bool mouthL = false;
     Timer game_timer;
-    int score;
+    int score, point, prize;
+    int max_timer_mode_lenght = 180;
     string username = "mohammad";
+
+    Button Quit;
+    Quit.create(Quit_button_norm, Quit_button_selected, screenWidth - 100, screenHeight / 2 - 100, 120, 80, 300);
+    Button Tryagain;
+    Tryagain.create(Tryagain_button_norm, Tryagain_button_selected, screenWidth - 100, screenHeight / 2 - 100, 120, 80, 300);
+    Button Choose_mode;
+    Choose_mode.create(Choose_mode_button_norm, Choose_mode_button_selected, screenWidth - 100, screenHeight / 2 - 100, 120, 80, 300);
+    Button Leaderboard;
+    Leaderboard.create(Leaderboard_button_norm, Leaderboard_button_selected, screenWidth - 100, screenHeight / 2 - 100, 120, 80, 300);
+
     while (is_gameRunning)
     {
         frameStart = SDL_GetTicks();
@@ -136,64 +166,166 @@ int main(int argv, char **args)
             SDL_RenderCopy(renderer, stone_background, NULL, NULL);
             if (mouthL)
                 mode = "game";
+            // int en = 0;
+            // char name[30];
+            // SDL_StartTextInput();
+            // while (en == 0)
+            // {
+            //     int i1 = 0;
+            //     SDL_Event e1;
+            //     while (SDL_PollEvent(&e1))
+            //     {
+            //         if (e1.type == SDL_TEXTINPUT)
+            //         {
+            //             strcat(name, e1.text.text);
+            //             cout<<e1.text.text;
+            //             i1 += 1;
+            //         }
+            //     }
+            // }
         }
-        else if(mode == "end_game")
+        else if (mode == "end_game")
         {
-            SDL_Surface* text_surface;
-            SDL_Texture* text_texture;
-            SDL_Color text_color = {0, 0, 255 };
-            SDL_Rect text_rect = {50 , 30 , 0 , 0 };
+            SDL_Surface *text_surface;
+            SDL_Texture *text_texture;
+            SDL_Color text_color = {0, 0, 255};
+            SDL_Rect text_rect = {50, 30, 0, 0};
 
-            text_surface = TTF_RenderText_Solid( arial_font, "username" , text_color );
-            text_texture = SDL_CreateTextureFromSurface( renderer, text_surface );
+            Tryagain.rect.x = 200;
+            Tryagain.rect.y = 500;
+            Choose_mode.rect.x = 400;
+            Choose_mode.rect.y = 500;
+            Leaderboard.rect.x = 600;
+            Leaderboard.rect.y = 500;
+            Quit.rect.x = 800;
+            Quit.rect.y = 500;
+
+            string prize_name;
+            if (prize == 0)
+                prize_name = "Fireball";
+            else if (prize == 1)
+                prize_name = "Bomb";
+            else if (prize == 2)
+                prize_name = "Lightning";
+            else if (prize == 3)
+                prize_name = "Rainbow";
+            else if (prize == 4)
+                prize_name = "Missile";
+
+            text_surface = TTF_RenderText_Solid(arial_font, "Username", text_color);
+            text_texture = SDL_CreateTextureFromSurface(renderer, text_surface);
             text_rect.w = text_surface->w;
             text_rect.h = text_surface->h;
             text_rect.x = 100;
             text_rect.y = 100;
-            SDL_RenderCopy( renderer, text_texture , NULL , &text_rect );
+            SDL_RenderCopy(renderer, text_texture, NULL, &text_rect);
 
-            text_surface = TTF_RenderText_Solid( arial_font, "score" , text_color );
-            text_texture = SDL_CreateTextureFromSurface( renderer, text_surface );
+            text_surface = TTF_RenderText_Solid(arial_font, "Mode", text_color);
+            text_texture = SDL_CreateTextureFromSurface(renderer, text_surface);
             text_rect.w = text_surface->w;
             text_rect.h = text_surface->h;
             text_rect.x = 400;
             text_rect.y = 100;
-            SDL_RenderCopy( renderer, text_texture , NULL , &text_rect );
+            SDL_RenderCopy(renderer, text_texture, NULL, &text_rect);
 
-            text_surface = TTF_RenderText_Solid( arial_font, "time" , text_color );
-            text_texture = SDL_CreateTextureFromSurface( renderer, text_surface );
+            text_surface = TTF_RenderText_Solid(arial_font, "Score", text_color);
+            text_texture = SDL_CreateTextureFromSurface(renderer, text_surface);
             text_rect.w = text_surface->w;
             text_rect.h = text_surface->h;
             text_rect.x = 600;
             text_rect.y = 100;
-            SDL_RenderCopy( renderer, text_texture , NULL , &text_rect );
+            SDL_RenderCopy(renderer, text_texture, NULL, &text_rect);
 
-            text_color = {200, 0, 0 };
+            text_surface = TTF_RenderText_Solid(arial_font, "Time", text_color);
+            text_texture = SDL_CreateTextureFromSurface(renderer, text_surface);
+            text_rect.w = text_surface->w;
+            text_rect.h = text_surface->h;
+            text_rect.x = 800;
+            text_rect.y = 100;
+            SDL_RenderCopy(renderer, text_texture, NULL, &text_rect);
 
-            text_surface = TTF_RenderText_Solid( arial_font, username.c_str() , text_color );
-            text_texture = SDL_CreateTextureFromSurface( renderer, text_surface );
+            text_surface = TTF_RenderText_Solid(arial_font, "Your Point", text_color);
+            text_texture = SDL_CreateTextureFromSurface(renderer, text_surface);
+            text_rect.w = text_surface->w;
+            text_rect.h = text_surface->h;
+            text_rect.x = 1000;
+            text_rect.y = 100;
+            SDL_RenderCopy(renderer, text_texture, NULL, &text_rect);
+
+            text_color = {200, 0, 0};
+
+            text_surface = TTF_RenderText_Solid(arial_font, username.c_str(), text_color);
+            text_texture = SDL_CreateTextureFromSurface(renderer, text_surface);
             text_rect.w = text_surface->w;
             text_rect.h = text_surface->h;
             text_rect.x = 100;
             text_rect.y = 160;
-            SDL_RenderCopy( renderer, text_texture , NULL , &text_rect );
+            SDL_RenderCopy(renderer, text_texture, NULL, &text_rect);
 
-            text_surface = TTF_RenderText_Solid( arial_font, to_string(score).c_str() , text_color );
-            text_texture = SDL_CreateTextureFromSurface( renderer, text_surface );
+            text_surface = TTF_RenderText_Solid(arial_font, game_mode.c_str(), text_color);
+            text_texture = SDL_CreateTextureFromSurface(renderer, text_surface);
             text_rect.w = text_surface->w;
             text_rect.h = text_surface->h;
             text_rect.x = 400;
             text_rect.y = 160;
-            SDL_RenderCopy( renderer, text_texture , NULL , &text_rect );
+            SDL_RenderCopy(renderer, text_texture, NULL, &text_rect);
 
-            text_surface = TTF_RenderText_Solid( arial_font, game_timer.get_current_time_minute_last().c_str() , text_color );
-            text_texture = SDL_CreateTextureFromSurface( renderer, text_surface );
+            text_surface = TTF_RenderText_Solid(arial_font, to_string(score).c_str(), text_color);
+            text_texture = SDL_CreateTextureFromSurface(renderer, text_surface);
             text_rect.w = text_surface->w;
             text_rect.h = text_surface->h;
             text_rect.x = 600;
             text_rect.y = 160;
-            SDL_RenderCopy( renderer, text_texture , NULL , &text_rect );
+            SDL_RenderCopy(renderer, text_texture, NULL, &text_rect);
 
+            text_surface = TTF_RenderText_Solid(arial_font, game_timer.get_current_time_minute_last().c_str(), text_color);
+            text_texture = SDL_CreateTextureFromSurface(renderer, text_surface);
+            text_rect.w = text_surface->w;
+            text_rect.h = text_surface->h;
+            text_rect.x = 800;
+            text_rect.y = 160;
+            SDL_RenderCopy(renderer, text_texture, NULL, &text_rect);
+
+            text_surface = TTF_RenderText_Solid(arial_font, to_string(point).c_str(), text_color);
+            text_texture = SDL_CreateTextureFromSurface(renderer, text_surface);
+            text_rect.w = text_surface->w;
+            text_rect.h = text_surface->h;
+            text_rect.x = 1000;
+            text_rect.y = 160;
+            SDL_RenderCopy(renderer, text_texture, NULL, &text_rect);
+
+            text_surface = TTF_RenderText_Solid(arial_font, ("You win       :  " + prize_name).c_str(), text_color);
+            text_texture = SDL_CreateTextureFromSurface(renderer, text_surface);
+            text_rect.w = (text_surface->w) * 1.2;
+            text_rect.h = (text_surface->h) * 1.2;
+            text_rect.x = 100;
+            text_rect.y = 260;
+            SDL_RenderCopy(renderer, text_texture, NULL, &text_rect);
+
+            Tryagain.Draw(renderer, &mouth);
+            Leaderboard.Draw(renderer, &mouth);
+            Quit.Draw(renderer, &mouth);
+            Choose_mode.Draw(renderer, &mouth);
+
+            if (mouthL)
+            {
+                if (Tryagain.is_clicked(&mouth))
+                {
+                    mode = "game";
+                }
+                if (Leaderboard.is_clicked(&mouth))
+                {
+                    cout << "Leaderboard";
+                }
+                if (Quit.is_clicked(&mouth))
+                {
+                    is_gameRunning = false;
+                }
+                if (Choose_mode.is_clicked(&mouth))
+                {
+                    cout << "Choose_mode";
+                }
+            }
         }
         else if (mode == "game")
         {
@@ -201,6 +333,7 @@ int main(int argv, char **args)
             Player player;
             player.creat(Cannon, screenWidth / 2, 300, 200, 80, 40, 40);
             map ma;
+            ma.total_lenght = 0;
             ma.tex = PathTex;
             ma.p1 = {50, screenHeight - 100};
             ma.p2 = {screenWidth / 2 - 200, screenHeight / 2};
@@ -216,7 +349,7 @@ int main(int argv, char **args)
             ma.draw_path(renderer);
             SDL_SetRenderTarget(renderer, NULL);
 
-            int balls_width = 50;
+            int balls_width = 48;
             Ball in_air_balls[20];
             int in_air_count = 0;
             int bullet_speed = 12;
@@ -227,15 +360,15 @@ int main(int argv, char **args)
             int count_ball = 30;
             Ball balls[200];
             creat_start_balls(count_ball, balls, ma.total_lenght, balls_width, Red_marble, Green_marble, Blue_marble, Yellow_marble, Red_marble_ice, Green_marble_ice, Blue_marble_ice, Yellow_marble_ice, Black_marble, Question_marble);
-            balls[29].current_loc = 800;
-            balls[28].time_effect_mode = REVERSE;
-            balls[28].time_effect_timer.creat();
-            balls[29].leftConnnected = false;
-            balls[28].rightConnnected = false;
-            balls[28].current_loc = 560;
-            balls[27].current_loc = 510;
-            balls[27].leftConnnected = false;
-            balls[26].rightConnnected = false;
+            //balls[29].current_loc = 800;
+            //balls[28].time_effect_mode = REVERSE;
+            //balls[28].time_effect_timer.creat();
+            //balls[29].leftConnnected = false;
+            //balls[28].rightConnnected = false;
+            //balls[28].current_loc = 560;
+            //balls[27].current_loc = 510;
+            //balls[27].leftConnnected = false;
+            //balls[26].rightConnnected = false;
 
             Ball bullet;
             make_cannon_ball(count_ball, balls, &bullet, balls_width, bullet_speed, &player, Red_marble, Green_marble, Blue_marble, Yellow_marble);
@@ -254,21 +387,21 @@ int main(int argv, char **args)
             Timer bullet_shoot;
             Timer time_effect_timer;
 
-            SDL_Surface* timer_surface;
-            SDL_Texture* timer_texture;
-            SDL_Color timer_color = { 255, 0, 0 };
-            SDL_Rect timer_rect = {screenWidth - 100 , 30 , 0 , 0 };
+            SDL_Surface *timer_surface;
+            SDL_Texture *timer_texture;
+            SDL_Color timer_color = {255, 0, 0};
+            SDL_Rect timer_rect = {screenWidth - 100, 30, 0, 0};
             string current_time;
 
-            SDL_Surface* score_surface;
-            SDL_Texture* score_texture;
-            SDL_Color score_color = {0, 255, 0 };
-            SDL_Rect score_rect = {50 , 30 , 0 , 0 };
+            SDL_Surface *score_surface;
+            SDL_Texture *score_texture;
+            SDL_Color score_color = {0, 255, 0};
+            SDL_Rect score_rect = {50, 30, 0, 0};
 
             Keyboard_handler game_keyboard;
             game_keyboard.delay = 500;
-            int time_effect_chance[4] = {20000 , 1 , 1 , 1};
-            int minute,second;
+            int time_effect_chance[4] = {20000, 1, 1, 1};
+            int minute, second;
 
             score = 0;
             game_timer.creat();
@@ -310,8 +443,8 @@ int main(int argv, char **args)
                 SDL_RenderCopy(renderer, BackGround, NULL, NULL);
                 player.Draw(renderer, &mouth);
 
-                if(current_time_mode != NONE)
-                    if(time_effect_timer.get_current_time() > 5000)
+                if (current_time_mode != NONE)
+                    if (time_effect_timer.get_current_time() > 5000)
                         current_time_mode = NONE;
 
                 if (current_time_mode == NONE)
@@ -325,35 +458,52 @@ int main(int argv, char **args)
                 handle_map_balls(count_ball, balls, balls_v, &ma);
                 for (int i = 0; i < count_ball; i++)
                 {
-                    if(balls[i].time_effect_mode == NONE)
+                    if (balls[i].time_effect_mode == NONE)
                         balls[i].Draw(renderer);
-                    else if(balls[i].time_effect_mode == STOP)
-                        balls[i].Draw(renderer , true , Stop_power);
-                    else if(balls[i].time_effect_mode == SLOWMO)
-                        balls[i].Draw(renderer , true , Slowmo_power);
-                    else if(balls[i].time_effect_mode == REVERSE)
-                        balls[i].Draw(renderer , true , Reverse_power);
-                    if(balls[i].color == "Red" || balls[i].color == "Yellow" || balls[i].color == "Blue" || balls[i].color == "Green")
+                    else if (balls[i].time_effect_mode == STOP)
+                        balls[i].Draw(renderer, true, Stop_power);
+                    else if (balls[i].time_effect_mode == SLOWMO)
+                        balls[i].Draw(renderer, true, Slowmo_power);
+                    else if (balls[i].time_effect_mode == REVERSE)
+                        balls[i].Draw(renderer, true, Reverse_power);
+                    if (balls[i].color == "Red" || balls[i].color == "Yellow" || balls[i].color == "Blue" || balls[i].color == "Green")
                     {
-                        int timeE = random(time_effect_chance , 4);
-                        if(timeE != 0 )
+                        int timeE = random(time_effect_chance, 4);
+                        if (timeE != 0)
                         {
                             balls[i].time_effect_mode = timeE;
                             balls[i].time_effect_timer.creat();
                         }
                     }
-                    if(game_mode == "normal")
+                    if (game_mode == "normal" || game_mode == "timer")
                     {
-                        if(balls[i].current_loc > ma.total_lenght)
+                        if (balls[i].current_loc > ma.total_lenght)
                         {
                             is_ingame = false;
                             mode = "end_game";
-                            game_timer.end();
+                            end_game(game_mode, score, &game_timer, &point, &prize);
                         }
                     }
                     //cout<<balls[i].leftConnnected<<balls[i].rightConnnected<<" ";
+                    // cout<<balls[i].current_loc<<" ";
                 }
                 //cout<<endl;
+                if (game_mode == "normal" || game_mode == "timer")
+                {
+                    if (count_ball == 0)
+                    {
+                        is_ingame = false;
+                        mode = "end_game";
+                        end_game(game_mode, score, &game_timer, &point, &prize);
+                    }
+                }
+                if ((max_timer_mode_lenght - (game_timer.get_current_time() - game_timer.start)) <= 0)
+                {
+                    is_ingame = false;
+                    mode = "end_game";
+                    end_game(game_mode, score, &game_timer, &point, &prize);
+                }
+
                 if (!bomb_power.is_inside(&mouth) && !rainbow_pawer.is_inside(&mouth) && !fireball_power.is_inside(&mouth) && ((mouthL && in_air_count == 0) || (mouthL && bullet.is_in_cannon && in_air_count < 20 && bullet_shoot.get_current_time() > 600)))
                 {
                     bullet.shoot(&mouth);
@@ -377,7 +527,7 @@ int main(int argv, char **args)
                     {
                         if (check_ball_collision(&in_air_balls[i], &balls[j]))
                         {
-                            collision(balls, &count_ball, j, &in_air_balls[i], &ma, balls_v, balls_width , &current_time_mode , &time_effect_timer);
+                            collision(balls, &count_ball, j, &in_air_balls[i], &ma, balls_v, balls_width, &current_time_mode, &time_effect_timer, &score);
                             deleted_index = i;
                             break;
                         }
@@ -419,18 +569,21 @@ int main(int argv, char **args)
                     }
                 }
 
-                current_time = game_timer.get_current_time_minute();
-                timer_surface = TTF_RenderText_Solid( arial_font, current_time.c_str() , timer_color );
-                timer_texture = SDL_CreateTextureFromSurface( renderer, timer_surface );
+                if (game_mode == "timer")
+                    current_time = game_timer.reverse_get_current_time(max_timer_mode_lenght);
+                else
+                    current_time = game_timer.get_current_time_minute();
+                timer_surface = TTF_RenderText_Solid(arial_font, current_time.c_str(), timer_color);
+                timer_texture = SDL_CreateTextureFromSurface(renderer, timer_surface);
                 timer_rect.w = timer_surface->w;
                 timer_rect.h = timer_surface->h;
-                SDL_RenderCopy( renderer, timer_texture , NULL , &timer_rect );
+                SDL_RenderCopy(renderer, timer_texture, NULL, &timer_rect);
 
-                score_surface = TTF_RenderText_Solid( arial_font, to_string(score).c_str() , score_color );
-                score_texture = SDL_CreateTextureFromSurface( renderer, score_surface );
+                score_surface = TTF_RenderText_Solid(arial_font, to_string(score).c_str(), score_color);
+                score_texture = SDL_CreateTextureFromSurface(renderer, score_surface);
                 score_rect.w = score_surface->w;
                 score_rect.h = score_surface->h;
-                SDL_RenderCopy( renderer, score_texture , NULL , &score_rect );
+                SDL_RenderCopy(renderer, score_texture, NULL, &score_rect);
 
                 SDL_RenderPresent(renderer);
                 frameTime = SDL_GetTicks() - frameStart;

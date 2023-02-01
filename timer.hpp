@@ -30,4 +30,12 @@ struct Timer
         second = t % 60;
         return to_string(minute) + " : " + to_string(second);
     }
+    string reverse_get_current_time(int max)
+    {
+        int t = max - (SDL_GetTicks() - start)/1000;
+        int minute,second;
+        minute = t / 60;
+        second = t % 60;
+        return to_string(minute) + " : " + to_string(second);
+    }
 };
