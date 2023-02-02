@@ -113,6 +113,14 @@ int main(int argv, char **args)
     SDL_Texture *Start_button_selected = IMG_LoadTexture(renderer, "assest/change_selected.png");
     SDL_Texture *Logout_button_norm = IMG_LoadTexture(renderer, "assest/change_norm.png");
     SDL_Texture *Logout_button_selected = IMG_LoadTexture(renderer, "assest/change_selected.png");
+    SDL_Texture *Normal_mode_button_norm = IMG_LoadTexture(renderer, "assest/change_norm.png");
+    SDL_Texture *Normal_mode_button_selected = IMG_LoadTexture(renderer, "assest/change_selected.png");
+    SDL_Texture *Timer_mode_button_norm = IMG_LoadTexture(renderer, "assest/change_norm.png");
+    SDL_Texture *Timer_mode_button_selected = IMG_LoadTexture(renderer, "assest/change_selected.png");
+    SDL_Texture *Stone_mode_button_norm = IMG_LoadTexture(renderer, "assest/change_norm.png");
+    SDL_Texture *Stone_mode_button_selected = IMG_LoadTexture(renderer, "assest/change_selected.png");
+    SDL_Texture *Fly_mode_button_norm = IMG_LoadTexture(renderer, "assest/change_norm.png");
+    SDL_Texture *Fly_mode_button_selected = IMG_LoadTexture(renderer, "assest/change_selected.png");
     SDL_Texture *Inputbox_norm = IMG_LoadTexture(renderer, "assest/input_box_norm.png");
     SDL_Texture *Inputbox_selected = IMG_LoadTexture(renderer, "assest/input_box_selected.png");
     SDL_Texture *Bomb = IMG_LoadTexture(renderer, "assest/bomb.png");
@@ -164,6 +172,14 @@ int main(int argv, char **args)
     Setting.create(Setting_button_norm, Setting_button_selected, screenWidth - 100, screenHeight / 2 - 100, 120, 80, 300);
     Button Logout;
     Logout.create(Logout_button_norm, Logout_button_selected, screenWidth - 100, screenHeight / 2 - 100, 120, 80, 300);
+    Button Normal_mode;
+    Normal_mode.create(Normal_mode_button_norm, Normal_mode_button_selected, 10, screenHeight / 2 - 150, 300, 300, 300);
+    Button Timer_mode;
+    Timer_mode.create(Timer_mode_button_norm, Timer_mode_button_selected, 330, screenHeight / 2 - 150, 300, 300, 300);
+    Button Stone_mode;
+    Stone_mode.create(Stone_mode_button_norm, Stone_mode_button_selected, 650, screenHeight / 2 - 150, 300, 300, 300);
+    Button Fly_mode;
+    Fly_mode.create(Fly_mode_button_norm, Fly_mode_button_selected, 970, screenHeight / 2 - 150, 300, 300, 300);
 
     Keyboard_handler input_keyboard;
     input_keyboard.delay = 3;
@@ -293,11 +309,8 @@ int main(int argv, char **args)
         else if (mode == "login")
         {
             SDL_RenderCopy(renderer, stone_background, NULL, NULL);
-            
-            SDL_Surface *text_surface;
-            SDL_Texture *text_texture;
+
             SDL_Color text_color = {0, 0, 0};
-            SDL_Rect text_rect = {50, 30, 0, 0};
 
             Register.rect.w = 150;
             Register.rect.h = 90;
@@ -314,29 +327,11 @@ int main(int argv, char **args)
             Quit.rect.x = 760;
             Quit.rect.y = 500;
 
-            text_surface = TTF_RenderText_Solid(arial_font2, "Login", text_color);
-            text_texture = SDL_CreateTextureFromSurface(renderer, text_surface);
-            text_rect.w = text_surface->w*2;
-            text_rect.h = text_surface->h*2;
-            text_rect.x = screenWidth/2 - text_rect.w/2;
-            text_rect.y = 50;
-            SDL_RenderCopy(renderer, text_texture, NULL, &text_rect);
+            draw_text(renderer , "Login" , arial_font2 , screenWidth/2 - 100 , 50, text_color.r , text_color.g , text_color.b , 2 , 2);
 
-            text_surface = TTF_RenderText_Solid(arial_font2, "Username :", text_color);
-            text_texture = SDL_CreateTextureFromSurface(renderer, text_surface);
-            text_rect.w = text_surface->w;
-            text_rect.h = text_surface->h;
-            text_rect.x = 100;
-            text_rect.y = username_input.text_rect.y;
-            SDL_RenderCopy(renderer, text_texture, NULL, &text_rect);
+            draw_text(renderer , "Username :" , arial_font2 , 100 , username_input.text_rect.y, text_color.r , text_color.g , text_color.b);
 
-            text_surface = TTF_RenderText_Solid(arial_font2, "Password :", text_color);
-            text_texture = SDL_CreateTextureFromSurface(renderer, text_surface);
-            text_rect.w = text_surface->w;
-            text_rect.h = text_surface->h;
-            text_rect.x = 100;
-            text_rect.y = password_input.text_rect.y;
-            SDL_RenderCopy(renderer, text_texture, NULL, &text_rect);
+            draw_text(renderer , "Password :", arial_font2 , 100 , password_input.text_rect.y, text_color.r , text_color.g , text_color.b);
 
             Register.Draw(renderer, &mouth);
             Done.Draw(renderer, &mouth);
@@ -386,10 +381,7 @@ int main(int argv, char **args)
         {
             SDL_RenderCopy(renderer, stone_background, NULL, NULL);
 
-            SDL_Surface *text_surface;
-            SDL_Texture *text_texture;
             SDL_Color text_color = {0, 0, 0};
-            SDL_Rect text_rect = {50, 30, 0, 0};
 
             Login.rect.w = 150;
             Login.rect.h = 90;
@@ -406,29 +398,11 @@ int main(int argv, char **args)
             Quit.rect.x = 760;
             Quit.rect.y = 500;
 
-            text_surface = TTF_RenderText_Solid(arial_font2, "Register", text_color);
-            text_texture = SDL_CreateTextureFromSurface(renderer, text_surface);
-            text_rect.w = text_surface->w*2;
-            text_rect.h = text_surface->h*2;
-            text_rect.x = screenWidth/2 - text_rect.w/2;
-            text_rect.y = 50;
-            SDL_RenderCopy(renderer, text_texture, NULL, &text_rect);
+            draw_text(renderer , "Register" , arial_font2 , screenWidth/2 - 100 , 50, text_color.r , text_color.g , text_color.b , 2 , 2);
 
-            text_surface = TTF_RenderText_Solid(arial_font2, "Username :", text_color);
-            text_texture = SDL_CreateTextureFromSurface(renderer, text_surface);
-            text_rect.w = text_surface->w;
-            text_rect.h = text_surface->h;
-            text_rect.x = 100;
-            text_rect.y = username_input.text_rect.y;
-            SDL_RenderCopy(renderer, text_texture, NULL, &text_rect);
+            draw_text(renderer , "Username :" , arial_font2 , 100 , username_input.text_rect.y, text_color.r , text_color.g , text_color.b);
 
-            text_surface = TTF_RenderText_Solid(arial_font2, "Password :", text_color);
-            text_texture = SDL_CreateTextureFromSurface(renderer, text_surface);
-            text_rect.w = text_surface->w;
-            text_rect.h = text_surface->h;
-            text_rect.x = 100;
-            text_rect.y = password_input.text_rect.y;
-            SDL_RenderCopy(renderer, text_texture, NULL, &text_rect);
+            draw_text(renderer , "Password :", arial_font2 , 100 , password_input.text_rect.y, text_color.r , text_color.g , text_color.b);
 
             Login.Draw(renderer, &mouth);
             Done.Draw(renderer, &mouth);
@@ -485,10 +459,7 @@ int main(int argv, char **args)
         {
             SDL_RenderCopy(renderer, stone_background, NULL, NULL);
 
-            SDL_Surface *text_surface;
-            SDL_Texture *text_texture;
             SDL_Color text_color = {0, 0, 0};
-            SDL_Rect text_rect = {50, 30, 0, 0};
 
             Start.rect.w = 250;
             Start.rect.h = 120;
@@ -515,13 +486,7 @@ int main(int argv, char **args)
             Quit.rect.x = screenWidth/2 - Quit.rect.w /2;
             Quit.rect.y = 650;
 
-            text_surface = TTF_RenderText_Solid(arial_font2, ("Wellcome "+users[current_user].username).c_str(), text_color);
-            text_texture = SDL_CreateTextureFromSurface(renderer, text_surface);
-            text_rect.w = text_surface->w;
-            text_rect.h = text_surface->h;
-            text_rect.x = 50;
-            text_rect.y = 50;
-            SDL_RenderCopy(renderer, text_texture, NULL, &text_rect);
+            draw_text(renderer , "Wellcome "+users[current_user].username , arial_font2 , 50 , 50, text_color.r , text_color.g , text_color.b);
 
             Start.Draw(renderer, &mouth);
             Leaderboard.Draw(renderer, &mouth);
@@ -533,7 +498,8 @@ int main(int argv, char **args)
             {
                 if (Start.is_clicked(&mouth))
                 {
-                    
+                    mode = "choose_mode";
+                    SDL_Delay(200);
                 }
                 if (Logout.is_clicked(&mouth))
                 {
@@ -543,11 +509,13 @@ int main(int argv, char **args)
                 }
                 if (Leaderboard.is_clicked(&mouth))
                 {
-                    
+                    mode = "leaderboard";
+                    SDL_Delay(200);
                 }
                 if (Setting.is_clicked(&mouth))
                 {
-                    
+                    mode = "setting";
+                    SDL_Delay(200);
                 }
                 if (Quit.is_clicked(&mouth))
                 {
@@ -555,12 +523,52 @@ int main(int argv, char **args)
                 }
             }
         }
+        else if (mode == "setting")
+        {
+
+        }
+        else if (mode == "leaderboard")
+        {
+
+        }
+        else if (mode == "choose_mode")
+        {
+            SDL_RenderCopy(renderer, stone_background, NULL, NULL);
+            Normal_mode.Draw(renderer, &mouth);
+            Timer_mode.Draw(renderer, &mouth);
+            Stone_mode.Draw(renderer , &mouth);
+            Fly_mode.Draw(renderer, &mouth);
+            if (mouthL)
+            {
+                if (Normal_mode.is_clicked(&mouth))
+                {
+                    mode = "game";
+                    game_mode = "normal";
+                    SDL_Delay(200);
+                }
+                if (Timer_mode.is_clicked(&mouth))
+                {
+                    mode = "game";
+                    game_mode = "timer";
+                    SDL_Delay(200);
+                }
+                if (Stone_mode.is_clicked(&mouth))
+                {
+                    mode = "game";
+                    game_mode = "stone";
+                    SDL_Delay(200);
+                }
+                if (Fly_mode.is_clicked(&mouth))
+                {
+                    mode = "game";
+                    game_mode = "fly";
+                    SDL_Delay(200);
+                }
+            }
+        }
         else if (mode == "end_game")
         {
-            SDL_Surface *text_surface;
-            SDL_Texture *text_texture;
             SDL_Color text_color = {0, 0, 255};
-            SDL_Rect text_rect = {50, 30, 0, 0};
 
             Tryagain.rect.x = 200;
             Tryagain.rect.y = 500;
@@ -591,95 +599,18 @@ int main(int argv, char **args)
             else if (prize == 4)
                 prize_name = "Missile";
 
-            text_surface = TTF_RenderText_Solid(arial_font, "Username", text_color);
-            text_texture = SDL_CreateTextureFromSurface(renderer, text_surface);
-            text_rect.w = text_surface->w;
-            text_rect.h = text_surface->h;
-            text_rect.x = 100;
-            text_rect.y = 100;
-            SDL_RenderCopy(renderer, text_texture, NULL, &text_rect);
-
-            text_surface = TTF_RenderText_Solid(arial_font, "Mode", text_color);
-            text_texture = SDL_CreateTextureFromSurface(renderer, text_surface);
-            text_rect.w = text_surface->w;
-            text_rect.h = text_surface->h;
-            text_rect.x = 400;
-            text_rect.y = 100;
-            SDL_RenderCopy(renderer, text_texture, NULL, &text_rect);
-
-            text_surface = TTF_RenderText_Solid(arial_font, "Score", text_color);
-            text_texture = SDL_CreateTextureFromSurface(renderer, text_surface);
-            text_rect.w = text_surface->w;
-            text_rect.h = text_surface->h;
-            text_rect.x = 600;
-            text_rect.y = 100;
-            SDL_RenderCopy(renderer, text_texture, NULL, &text_rect);
-
-            text_surface = TTF_RenderText_Solid(arial_font, "Time", text_color);
-            text_texture = SDL_CreateTextureFromSurface(renderer, text_surface);
-            text_rect.w = text_surface->w;
-            text_rect.h = text_surface->h;
-            text_rect.x = 800;
-            text_rect.y = 100;
-            SDL_RenderCopy(renderer, text_texture, NULL, &text_rect);
-
-            text_surface = TTF_RenderText_Solid(arial_font, "Your Point", text_color);
-            text_texture = SDL_CreateTextureFromSurface(renderer, text_surface);
-            text_rect.w = text_surface->w;
-            text_rect.h = text_surface->h;
-            text_rect.x = 1000;
-            text_rect.y = 100;
-            SDL_RenderCopy(renderer, text_texture, NULL, &text_rect);
-
+            draw_text(renderer , "Username", arial_font , 100 , 100, text_color.r , text_color.g , text_color.b);
+            draw_text(renderer , "Mode", arial_font , 400 , 100, text_color.r , text_color.g , text_color.b);
+            draw_text(renderer , "Score", arial_font , 600 , 100, text_color.r , text_color.g , text_color.b);
+            draw_text(renderer , "Time", arial_font , 800 , 100, text_color.r , text_color.g , text_color.b);
+            draw_text(renderer , "Your Point", arial_font , 1000 , 100, text_color.r , text_color.g , text_color.b);
             text_color = {200, 0, 0};
-
-            text_surface = TTF_RenderText_Solid(arial_font, username.c_str(), text_color);
-            text_texture = SDL_CreateTextureFromSurface(renderer, text_surface);
-            text_rect.w = text_surface->w;
-            text_rect.h = text_surface->h;
-            text_rect.x = 100;
-            text_rect.y = 160;
-            SDL_RenderCopy(renderer, text_texture, NULL, &text_rect);
-
-            text_surface = TTF_RenderText_Solid(arial_font, game_mode.c_str(), text_color);
-            text_texture = SDL_CreateTextureFromSurface(renderer, text_surface);
-            text_rect.w = text_surface->w;
-            text_rect.h = text_surface->h;
-            text_rect.x = 400;
-            text_rect.y = 160;
-            SDL_RenderCopy(renderer, text_texture, NULL, &text_rect);
-
-            text_surface = TTF_RenderText_Solid(arial_font, to_string(score).c_str(), text_color);
-            text_texture = SDL_CreateTextureFromSurface(renderer, text_surface);
-            text_rect.w = text_surface->w;
-            text_rect.h = text_surface->h;
-            text_rect.x = 600;
-            text_rect.y = 160;
-            SDL_RenderCopy(renderer, text_texture, NULL, &text_rect);
-
-            text_surface = TTF_RenderText_Solid(arial_font, game_timer.get_current_time_minute_last().c_str(), text_color);
-            text_texture = SDL_CreateTextureFromSurface(renderer, text_surface);
-            text_rect.w = text_surface->w;
-            text_rect.h = text_surface->h;
-            text_rect.x = 800;
-            text_rect.y = 160;
-            SDL_RenderCopy(renderer, text_texture, NULL, &text_rect);
-
-            text_surface = TTF_RenderText_Solid(arial_font, to_string(point).c_str(), text_color);
-            text_texture = SDL_CreateTextureFromSurface(renderer, text_surface);
-            text_rect.w = text_surface->w;
-            text_rect.h = text_surface->h;
-            text_rect.x = 1000;
-            text_rect.y = 160;
-            SDL_RenderCopy(renderer, text_texture, NULL, &text_rect);
-
-            text_surface = TTF_RenderText_Solid(arial_font, ("You win       :  " + prize_name).c_str(), text_color);
-            text_texture = SDL_CreateTextureFromSurface(renderer, text_surface);
-            text_rect.w = (text_surface->w) * 1.2;
-            text_rect.h = (text_surface->h) * 1.2;
-            text_rect.x = 100;
-            text_rect.y = 260;
-            SDL_RenderCopy(renderer, text_texture, NULL, &text_rect);
+            draw_text(renderer , users[current_user].username, arial_font , 100 , 160, text_color.r , text_color.g , text_color.b);
+            draw_text(renderer , game_mode, arial_font , 400 , 160, text_color.r , text_color.g , text_color.b);
+            draw_text(renderer , to_string(score), arial_font , 600 , 160, text_color.r , text_color.g , text_color.b);
+            draw_text(renderer , game_timer.get_current_time_minute_last(), arial_font , 800 , 160, text_color.r , text_color.g , text_color.b);
+            draw_text(renderer , to_string(point), arial_font , 1000 , 160, text_color.r , text_color.g , text_color.b);
+            draw_text(renderer , ("You win       :  " + prize_name), arial_font , 100 , 260, text_color.r , text_color.g , text_color.b , 1.2 , 1.2);
 
             Tryagain.Draw(renderer, &mouth);
             Leaderboard.Draw(renderer, &mouth);
@@ -691,10 +622,12 @@ int main(int argv, char **args)
                 if (Tryagain.is_clicked(&mouth))
                 {
                     mode = "game";
+                    SDL_Delay(200);
                 }
                 if (Leaderboard.is_clicked(&mouth))
                 {
-                    cout << "Leaderboard";
+                    mode = "leaderboard";
+                    SDL_Delay(200);
                 }
                 if (Quit.is_clicked(&mouth))
                 {
@@ -702,7 +635,8 @@ int main(int argv, char **args)
                 }
                 if (Choose_mode.is_clicked(&mouth))
                 {
-                    cout << "Choose_mode";
+                    mode = "choose_mode";
+                    SDL_Delay(200);
                 }
             }
         }
@@ -767,16 +701,10 @@ int main(int argv, char **args)
             Timer bullet_shoot;
             Timer time_effect_timer;
 
-            SDL_Surface *timer_surface;
-            SDL_Texture *timer_texture;
             SDL_Color timer_color = {255, 0, 0};
-            SDL_Rect timer_rect = {screenWidth - 100, 30, 0, 0};
             string current_time;
 
-            SDL_Surface *score_surface;
-            SDL_Texture *score_texture;
             SDL_Color score_color = {0, 255, 0};
-            SDL_Rect score_rect = {50, 30, 0, 0};
 
             Keyboard_handler game_keyboard;
             game_keyboard.delay = 500;
@@ -968,17 +896,9 @@ int main(int argv, char **args)
                     current_time = game_timer.reverse_get_current_time(max_timer_mode_lenght);
                 else
                     current_time = game_timer.get_current_time_minute();
-                timer_surface = TTF_RenderText_Solid(arial_font, current_time.c_str(), timer_color);
-                timer_texture = SDL_CreateTextureFromSurface(renderer, timer_surface);
-                timer_rect.w = timer_surface->w;
-                timer_rect.h = timer_surface->h;
-                SDL_RenderCopy(renderer, timer_texture, NULL, &timer_rect);
 
-                score_surface = TTF_RenderText_Solid(arial_font, to_string(score).c_str(), score_color);
-                score_texture = SDL_CreateTextureFromSurface(renderer, score_surface);
-                score_rect.w = score_surface->w;
-                score_rect.h = score_surface->h;
-                SDL_RenderCopy(renderer, score_texture, NULL, &score_rect);
+                draw_text(renderer , current_time, arial_font , screenWidth - 100, 30, timer_color.r , timer_color.g , timer_color.b);
+                draw_text(renderer , to_string(score), arial_font , 50, 30, score_color.r , score_color.g , score_color.b);
 
                 SDL_RenderPresent(renderer);
                 frameTime = SDL_GetTicks() - frameStart;

@@ -5,8 +5,6 @@ struct Inputbox
     bool is_selected;
     string text;
     SDL_Rect rect;
-    SDL_Surface *text_surface;
-    SDL_Texture *text_texture;
     SDL_Color text_color;
     SDL_Rect text_rect;
     void create(SDL_Texture *norm_texture , SDL_Texture *selected_texture ,int x , int y , int w , int h , int margin , int R , int G , int B)
@@ -52,11 +50,12 @@ struct Inputbox
             SDL_RenderCopy(renderer , norm_tex , NULL , &rect);
         if(text != "")
         {
-            text_surface = TTF_RenderText_Solid(font, text.c_str(), text_color);
-            text_texture = SDL_CreateTextureFromSurface(renderer, text_surface);
-            text_rect.w = text_surface->w;
-            text_rect.h = text_surface->h;
-            SDL_RenderCopy(renderer, text_texture, NULL, &text_rect);
+            // text_surface = TTF_RenderText_Solid(font, text.c_str(), text_color);
+            // text_texture = SDL_CreateTextureFromSurface(renderer, text_surface);
+            // text_rect.w = text_surface->w;
+            // text_rect.h = text_surface->h;
+            // SDL_RenderCopy(renderer, text_texture, NULL, &text_rect);
+            draw_text(renderer , text , font , text_rect.x , text_rect.y , text_color.r , text_color.g , text_color.b );
         }
     }
 };
