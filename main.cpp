@@ -1,7 +1,7 @@
 #include <iostream>
 #include <cmath>
-#include <vector>
 #include <time.h>
+#include <fstream>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
@@ -36,6 +36,8 @@ enum time_modes
 #include "ball.hpp"
 #include "keyboard_handler.hpp"
 #include "button.hpp"
+#include "inputbox.hpp"
+#include "user.hpp"
 
 void end_game(string game_mode, int score, Timer *game_timer, int *point, int *prize)
 {
@@ -93,12 +95,26 @@ int main(int argv, char **args)
     SDL_Texture *Fireball_power_button_selected = IMG_LoadTexture(renderer, "assest/change_selected.png");
     SDL_Texture *Quit_button_norm = IMG_LoadTexture(renderer, "assest/change_norm.png");
     SDL_Texture *Quit_button_selected = IMG_LoadTexture(renderer, "assest/change_selected.png");
+    SDL_Texture *Login_button_norm = IMG_LoadTexture(renderer, "assest/change_norm.png");
+    SDL_Texture *Login_button_selected = IMG_LoadTexture(renderer, "assest/change_selected.png");
+    SDL_Texture *Register_button_norm = IMG_LoadTexture(renderer, "assest/change_norm.png");
+    SDL_Texture *Register_button_selected = IMG_LoadTexture(renderer, "assest/change_selected.png");
     SDL_Texture *Leaderboard_button_norm = IMG_LoadTexture(renderer, "assest/change_norm.png");
     SDL_Texture *Leaderboard_button_selected = IMG_LoadTexture(renderer, "assest/change_selected.png");
     SDL_Texture *Tryagain_button_norm = IMG_LoadTexture(renderer, "assest/change_norm.png");
     SDL_Texture *Tryagain_button_selected = IMG_LoadTexture(renderer, "assest/change_selected.png");
     SDL_Texture *Choose_mode_button_norm = IMG_LoadTexture(renderer, "assest/change_norm.png");
     SDL_Texture *Choose_mode_button_selected = IMG_LoadTexture(renderer, "assest/change_selected.png");
+    SDL_Texture *Done_button_norm = IMG_LoadTexture(renderer, "assest/change_norm.png");
+    SDL_Texture *Done_button_selected = IMG_LoadTexture(renderer, "assest/change_selected.png");
+    SDL_Texture *Setting_button_norm = IMG_LoadTexture(renderer, "assest/change_norm.png");
+    SDL_Texture *Setting_button_selected = IMG_LoadTexture(renderer, "assest/change_selected.png");
+    SDL_Texture *Start_button_norm = IMG_LoadTexture(renderer, "assest/change_norm.png");
+    SDL_Texture *Start_button_selected = IMG_LoadTexture(renderer, "assest/change_selected.png");
+    SDL_Texture *Logout_button_norm = IMG_LoadTexture(renderer, "assest/change_norm.png");
+    SDL_Texture *Logout_button_selected = IMG_LoadTexture(renderer, "assest/change_selected.png");
+    SDL_Texture *Inputbox_norm = IMG_LoadTexture(renderer, "assest/input_box_norm.png");
+    SDL_Texture *Inputbox_selected = IMG_LoadTexture(renderer, "assest/input_box_selected.png");
     SDL_Texture *Bomb = IMG_LoadTexture(renderer, "assest/bomb.png");
     SDL_Texture *Rainbow = IMG_LoadTexture(renderer, "assest/bomb.png");
     SDL_Texture *Fireball = IMG_LoadTexture(renderer, "assest/bomb.png");
@@ -107,12 +123,13 @@ int main(int argv, char **args)
     SDL_Texture *Reverse_power = IMG_LoadTexture(renderer, "assest/reverse_power.png");
 
     TTF_Font *arial_font = TTF_OpenFont("assest/arial.ttf", 24);
+    TTF_Font *arial_font2 = TTF_OpenFont("assest/arial.ttf", 32);
 
     SDL_Texture *BackGround = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_UNKNOWN, SDL_TEXTUREACCESS_TARGET, screenWidth, screenHeight);
     //SDL_SetRenderDrawColor( renderer, 0, 0,255, 0 );
     //SDL_RenderClear( renderer );
 
-    string mode = "login_menu";
+    string mode = "start_menu";
     string game_mode = "stone";
     SDL_Rect fullScreen = {0, 0, screenWidth, screenHeight};
 
@@ -125,7 +142,7 @@ int main(int argv, char **args)
     Timer game_timer;
     int score, point, prize;
     int max_timer_mode_lenght = 180;
-    string username = "mohammad";
+    //string username = "mohammad";
 
     Button Quit;
     Quit.create(Quit_button_norm, Quit_button_selected, screenWidth - 100, screenHeight / 2 - 100, 120, 80, 300);
@@ -135,6 +152,60 @@ int main(int argv, char **args)
     Choose_mode.create(Choose_mode_button_norm, Choose_mode_button_selected, screenWidth - 100, screenHeight / 2 - 100, 120, 80, 300);
     Button Leaderboard;
     Leaderboard.create(Leaderboard_button_norm, Leaderboard_button_selected, screenWidth - 100, screenHeight / 2 - 100, 120, 80, 300);
+    Button Register;
+    Register.create(Register_button_norm, Register_button_selected, screenWidth - 100, screenHeight / 2 - 100, 120, 80, 300);
+    Button Login;
+    Login.create(Login_button_norm, Login_button_selected, screenWidth - 100, screenHeight / 2 - 100, 120, 80, 300);
+    Button Done;
+    Done.create(Done_button_norm, Done_button_selected, screenWidth - 100, screenHeight / 2 - 100, 120, 80, 300);
+    Button Start;
+    Start.create(Start_button_norm, Start_button_selected, screenWidth - 100, screenHeight / 2 - 100, 120, 80, 300);
+    Button Setting;
+    Setting.create(Setting_button_norm, Setting_button_selected, screenWidth - 100, screenHeight / 2 - 100, 120, 80, 300);
+    Button Logout;
+    Logout.create(Logout_button_norm, Logout_button_selected, screenWidth - 100, screenHeight / 2 - 100, 120, 80, 300);
+
+    Keyboard_handler input_keyboard;
+    input_keyboard.delay = 3;
+
+    Inputbox username_input;
+    username_input.create(Inputbox_norm , Inputbox_selected , screenWidth/2 - 300 , 150 , 600 , 100 , 30 , 0 , 0 , 0 );
+
+    Inputbox password_input;
+    password_input.create(Inputbox_norm , Inputbox_selected , screenWidth/2 - 300 , 320 , 600 , 100 , 30 , 0 , 0 , 0 );
+
+    string username , password;
+
+    int current_user  = -1;
+    int count_user = 0;
+    User users[100];
+    count_user = load_users(users);
+    
+    // users[0].username = "test";
+    // users[0].password = "tsetset";
+    // users[0].bomb_power = 6;
+    // users[0].missile_power = 6;
+    // users[0].rainbow_power = 6;
+    // users[0].fireball_power = 6;
+    // users[0].lightning_power = 6;
+    // users[0].max_stone = 6;
+    // users[0].max_fly = 6;
+    // users[0].max_normal = 6;
+    // users[0].max_timer = 6;
+    // count_user++;
+    // users[1].username = "mohammad";
+    // users[1].password = "moahadmsdosif";
+    // users[1].bomb_power = 6;
+    // users[1].missile_power = 6;
+    // users[1].rainbow_power = 6;
+    // users[1].fireball_power = 6;
+    // users[1].lightning_power = 6;
+    // users[1].max_stone = 6;
+    // users[1].max_fly = 6;
+    // users[1].max_normal = 6;
+    // users[1].max_timer = 6;
+    // count_user++;
+    // write_users(users , count_user);
 
     while (is_gameRunning)
     {
@@ -160,36 +231,329 @@ int main(int argv, char **args)
             case SDL_KEYDOWN:
                 if (event.key.keysym.sym == SDLK_q)
                     is_gameRunning = false;
+                if (mode == "login" || mode == "register")
+                {
+                    input_keyboard.keydown(&event);
+                }
+                break;
+            case SDL_KEYUP:
+                if (mode == "login" || mode == "register")
+                {
+                    input_keyboard.keyup(&event);
+                }
                 break;
             }
         }
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
 
-        if (mode == "login_menu")
+        if (mode == "start_menu")
         {
             SDL_RenderCopy(renderer, stone_background, NULL, NULL);
+
+            Login.rect.w = 250;
+            Login.rect.h = 120;
+            Login.rect.x = screenWidth/2 - Login.rect.w /2;
+            Login.rect.y = 100;
+
+            Register.rect.w = 250;
+            Register.rect.h = 120;
+            Register.rect.x = screenWidth/2 - Register.rect.w /2;
+            Register.rect.y = 300;
+
+            Quit.rect.w = 250;
+            Quit.rect.h = 120;
+            Quit.rect.x = screenWidth/2 - Quit.rect.w /2;
+            Quit.rect.y = 500;
+
+            Login.Draw(renderer, &mouth);
+            Register.Draw(renderer, &mouth);
+            Quit.Draw(renderer, &mouth);
+
             if (mouthL)
-                mode = "game";
-            //int t[10];
-            //random_array(t , 10 , 0 , 80);
-            // int en = 0;
-            // char name[30];
-            // SDL_StartTextInput();
-            // while (en == 0)
-            // {
-            //     int i1 = 0;
-            //     SDL_Event e1;
-            //     while (SDL_PollEvent(&e1))
-            //     {
-            //         if (e1.type == SDL_TEXTINPUT)
-            //         {
-            //             strcat(name, e1.text.text);
-            //             cout<<e1.text.text;
-            //             i1 += 1;
-            //         }
-            //     }
-            // }
+            {
+                if (Login.is_clicked(&mouth))
+                {
+                    mode = "login";
+                    username_input.text = "";
+                    password_input.text = "";
+                }
+                if (Register.is_clicked(&mouth))
+                {
+                    mode = "register";
+                    username_input.text = "";
+                    password_input.text = "";
+                }
+                if (Quit.is_clicked(&mouth))
+                {
+                    is_gameRunning = false;
+                }
+            }
+        }
+        else if (mode == "login")
+        {
+            SDL_RenderCopy(renderer, stone_background, NULL, NULL);
+            
+            SDL_Surface *text_surface;
+            SDL_Texture *text_texture;
+            SDL_Color text_color = {0, 0, 0};
+            SDL_Rect text_rect = {50, 30, 0, 0};
+
+            Register.rect.w = 150;
+            Register.rect.h = 90;
+            Register.rect.x = 360;
+            Register.rect.y = 500;
+
+            Done.rect.w = 150;
+            Done.rect.h = 90;
+            Done.rect.x = 560;
+            Done.rect.y = 500;
+
+            Quit.rect.w = 150;
+            Quit.rect.h = 90;
+            Quit.rect.x = 760;
+            Quit.rect.y = 500;
+
+            text_surface = TTF_RenderText_Solid(arial_font2, "Login", text_color);
+            text_texture = SDL_CreateTextureFromSurface(renderer, text_surface);
+            text_rect.w = text_surface->w*2;
+            text_rect.h = text_surface->h*2;
+            text_rect.x = screenWidth/2 - text_rect.w/2;
+            text_rect.y = 50;
+            SDL_RenderCopy(renderer, text_texture, NULL, &text_rect);
+
+            text_surface = TTF_RenderText_Solid(arial_font2, "Username :", text_color);
+            text_texture = SDL_CreateTextureFromSurface(renderer, text_surface);
+            text_rect.w = text_surface->w;
+            text_rect.h = text_surface->h;
+            text_rect.x = 100;
+            text_rect.y = username_input.text_rect.y;
+            SDL_RenderCopy(renderer, text_texture, NULL, &text_rect);
+
+            text_surface = TTF_RenderText_Solid(arial_font2, "Password :", text_color);
+            text_texture = SDL_CreateTextureFromSurface(renderer, text_surface);
+            text_rect.w = text_surface->w;
+            text_rect.h = text_surface->h;
+            text_rect.x = 100;
+            text_rect.y = password_input.text_rect.y;
+            SDL_RenderCopy(renderer, text_texture, NULL, &text_rect);
+
+            Register.Draw(renderer, &mouth);
+            Done.Draw(renderer, &mouth);
+            Quit.Draw(renderer, &mouth);
+
+            if (mouthL)
+            {
+                if(username_input.select(&mouth))
+                    password_input.is_selected = false;
+                if(password_input.select(&mouth))
+                    username_input.is_selected = false;
+                if (Register.is_clicked(&mouth))
+                {
+                    mode = "register";
+                    username_input.text = "";
+                    password_input.text = "";
+                    SDL_Delay(200);
+                }
+                if(Done.is_clicked(&mouth))
+                {
+                    int c = is_user_exist(users , count_user , username_input.text);
+                    if(c != -1)
+                    {
+                        if(users[c].password == password_input.text)
+                        {
+                            current_user = c;
+                            mode = "main_menu";
+                            SDL_Delay(200);
+                        }
+                        else
+                            cout<<"Wrong Password"<<endl;
+                    }
+                    else
+                        cout<<"User Dosent Exist"<<endl;
+                }
+                if (Quit.is_clicked(&mouth))
+                {
+                    is_gameRunning = false;
+                }
+            }
+            username_input.input(&input_keyboard);
+            username_input.Draw(renderer , arial_font2);
+            password_input.input(&input_keyboard);
+            password_input.Draw(renderer , arial_font2);
+        }
+        else if (mode == "register")
+        {
+            SDL_RenderCopy(renderer, stone_background, NULL, NULL);
+
+            SDL_Surface *text_surface;
+            SDL_Texture *text_texture;
+            SDL_Color text_color = {0, 0, 0};
+            SDL_Rect text_rect = {50, 30, 0, 0};
+
+            Login.rect.w = 150;
+            Login.rect.h = 90;
+            Login.rect.x = 360;
+            Login.rect.y = 500;
+
+            Done.rect.w = 150;
+            Done.rect.h = 90;
+            Done.rect.x = 560;
+            Done.rect.y = 500;
+
+            Quit.rect.w = 150;
+            Quit.rect.h = 90;
+            Quit.rect.x = 760;
+            Quit.rect.y = 500;
+
+            text_surface = TTF_RenderText_Solid(arial_font2, "Register", text_color);
+            text_texture = SDL_CreateTextureFromSurface(renderer, text_surface);
+            text_rect.w = text_surface->w*2;
+            text_rect.h = text_surface->h*2;
+            text_rect.x = screenWidth/2 - text_rect.w/2;
+            text_rect.y = 50;
+            SDL_RenderCopy(renderer, text_texture, NULL, &text_rect);
+
+            text_surface = TTF_RenderText_Solid(arial_font2, "Username :", text_color);
+            text_texture = SDL_CreateTextureFromSurface(renderer, text_surface);
+            text_rect.w = text_surface->w;
+            text_rect.h = text_surface->h;
+            text_rect.x = 100;
+            text_rect.y = username_input.text_rect.y;
+            SDL_RenderCopy(renderer, text_texture, NULL, &text_rect);
+
+            text_surface = TTF_RenderText_Solid(arial_font2, "Password :", text_color);
+            text_texture = SDL_CreateTextureFromSurface(renderer, text_surface);
+            text_rect.w = text_surface->w;
+            text_rect.h = text_surface->h;
+            text_rect.x = 100;
+            text_rect.y = password_input.text_rect.y;
+            SDL_RenderCopy(renderer, text_texture, NULL, &text_rect);
+
+            Login.Draw(renderer, &mouth);
+            Done.Draw(renderer, &mouth);
+            Quit.Draw(renderer, &mouth);
+
+            if (mouthL)
+            {
+                if(username_input.select(&mouth))
+                    password_input.is_selected = false;
+                if(password_input.select(&mouth))
+                    username_input.is_selected = false;
+                if (Login.is_clicked(&mouth))
+                {
+                    mode = "login";
+                    username_input.text = "";
+                    password_input.text = "";
+                    SDL_Delay(200);
+                }
+                if(Done.is_clicked(&mouth))
+                {
+                    if(is_user_exist(users , count_user , username_input.text) == -1)
+                    {
+                        users[count_user].username = username_input.text;
+                        users[count_user].password = password_input.text;
+                        users[count_user].bomb_power = 3;
+                        users[count_user].missile_power = 3;
+                        users[count_user].rainbow_power = 3;
+                        users[count_user].fireball_power = 3;
+                        users[count_user].lightning_power = 3;
+                        users[count_user].max_stone = 0;
+                        users[count_user].max_fly = 0;
+                        users[count_user].max_normal = 0;
+                        users[count_user].max_timer = 0;
+                        current_user = count_user;
+                        count_user++;
+                        write_users(users , count_user);
+                        mode = "main_menu";
+                        SDL_Delay(200);
+                    }
+                    else
+                        cout<<"User Already Exist"<<endl;
+                }
+                if (Quit.is_clicked(&mouth))
+                {
+                    is_gameRunning = false;
+                }
+            }
+            username_input.input(&input_keyboard);
+            username_input.Draw(renderer , arial_font2);
+            password_input.input(&input_keyboard);
+            password_input.Draw(renderer , arial_font2);
+        }
+        else if (mode == "main_menu")
+        {
+            SDL_RenderCopy(renderer, stone_background, NULL, NULL);
+
+            SDL_Surface *text_surface;
+            SDL_Texture *text_texture;
+            SDL_Color text_color = {0, 0, 0};
+            SDL_Rect text_rect = {50, 30, 0, 0};
+
+            Start.rect.w = 250;
+            Start.rect.h = 120;
+            Start.rect.x = screenWidth/2 - Start.rect.w /2;
+            Start.rect.y = 50;
+
+            Leaderboard.rect.w = 250;
+            Leaderboard.rect.h = 120;
+            Leaderboard.rect.x = screenWidth/2 - Leaderboard.rect.w /2;
+            Leaderboard.rect.y = 200;
+
+            Setting.rect.w = 250;
+            Setting.rect.h = 120;
+            Setting.rect.x = screenWidth/2 - Setting.rect.w /2;
+            Setting.rect.y = 350;
+
+            Logout.rect.w = 250;
+            Logout.rect.h = 120;
+            Logout.rect.x = screenWidth/2 - Logout.rect.w /2;
+            Logout.rect.y = 500;
+
+            Quit.rect.w = 250;
+            Quit.rect.h = 120;
+            Quit.rect.x = screenWidth/2 - Quit.rect.w /2;
+            Quit.rect.y = 650;
+
+            text_surface = TTF_RenderText_Solid(arial_font2, ("Wellcome "+users[current_user].username).c_str(), text_color);
+            text_texture = SDL_CreateTextureFromSurface(renderer, text_surface);
+            text_rect.w = text_surface->w;
+            text_rect.h = text_surface->h;
+            text_rect.x = 50;
+            text_rect.y = 50;
+            SDL_RenderCopy(renderer, text_texture, NULL, &text_rect);
+
+            Start.Draw(renderer, &mouth);
+            Leaderboard.Draw(renderer, &mouth);
+            Logout.Draw(renderer , &mouth);
+            Setting.Draw(renderer, &mouth);
+            Quit.Draw(renderer, &mouth);
+
+            if (mouthL)
+            {
+                if (Start.is_clicked(&mouth))
+                {
+                    
+                }
+                if (Logout.is_clicked(&mouth))
+                {
+                    mode = "start_menu";
+                    current_user = -1;
+                    SDL_Delay(200);
+                }
+                if (Leaderboard.is_clicked(&mouth))
+                {
+                    
+                }
+                if (Setting.is_clicked(&mouth))
+                {
+                    
+                }
+                if (Quit.is_clicked(&mouth))
+                {
+                    is_gameRunning = false;
+                }
+            }
         }
         else if (mode == "end_game")
         {
@@ -200,12 +564,20 @@ int main(int argv, char **args)
 
             Tryagain.rect.x = 200;
             Tryagain.rect.y = 500;
+            Tryagain.rect.w = 150;
+            Tryagain.rect.h = 90;
             Choose_mode.rect.x = 400;
             Choose_mode.rect.y = 500;
+            Choose_mode.rect.w = 150;
+            Choose_mode.rect.h = 90;
             Leaderboard.rect.x = 600;
             Leaderboard.rect.y = 500;
+            Leaderboard.rect.w = 150;
+            Leaderboard.rect.h = 90;
             Quit.rect.x = 800;
             Quit.rect.y = 500;
+            Quit.rect.w = 150;
+            Quit.rect.h = 90;
 
             string prize_name;
             if (prize == 0)

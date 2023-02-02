@@ -2,7 +2,7 @@ struct Keyboard_handler
 {
     bool is_down = false;
     bool is_anything;
-    char curruntK;
+    char curruntK = '!';
     int delay;
     Timer timer;
     void keydown(SDL_Event *event)
@@ -65,6 +65,28 @@ struct Keyboard_handler
                 curruntK = 'y';
             else if (event->key.keysym.sym == SDLK_z)
                 curruntK = 'z';
+            else if (event->key.keysym.sym == SDLK_1 || event->key.keysym.sym == SDLK_KP_1)
+                curruntK = '1';
+            else if (event->key.keysym.sym == SDLK_2 || event->key.keysym.sym == SDLK_KP_2)
+                curruntK = '2';
+            else if (event->key.keysym.sym == SDLK_3 || event->key.keysym.sym == SDLK_KP_3)
+                curruntK = '3';
+            else if (event->key.keysym.sym == SDLK_4 || event->key.keysym.sym == SDLK_KP_4)
+                curruntK = '4';
+            else if (event->key.keysym.sym == SDLK_5 || event->key.keysym.sym == SDLK_KP_5)
+                curruntK = '5';
+            else if (event->key.keysym.sym == SDLK_6 || event->key.keysym.sym == SDLK_KP_6)
+                curruntK = '6';
+            else if (event->key.keysym.sym == SDLK_7 || event->key.keysym.sym == SDLK_KP_7)
+                curruntK = '7';
+            else if (event->key.keysym.sym == SDLK_8 || event->key.keysym.sym == SDLK_KP_8)
+                curruntK = '8';
+            else if (event->key.keysym.sym == SDLK_9 || event->key.keysym.sym == SDLK_KP_9)
+                curruntK = '9';
+            else if (event->key.keysym.sym == SDLK_0 || event->key.keysym.sym == SDLK_KP_0)
+                curruntK = '0';
+            else if (event->key.keysym.sym == SDLK_BACKSPACE)
+                curruntK = '@';
             is_anything = true;
         }
     }
