@@ -229,6 +229,17 @@ void handle_map_balls(int count_ball, Ball balls[], double balls_v, map *ma)
                     while (j < count_ball && balls[j].rightConnnected)
                         balls[j++].normal_v = 0;
                 }
+                else if(balls[i].current_loc - balls[i].rect.w <= balls[i - 1].current_loc)
+                {
+                    balls[i - 1].rightConnnected = true;
+                    balls[i].leftConnnected = true;
+                    int j = i;
+                    balls[i].update(ma);
+                    balls[i].normal_v =0;
+                    if(balls[i].normal_v!=0)
+                        while (j < count_ball && balls[j].rightConnnected)
+                            balls[++j].normal_v = 0;
+                }
                 else
                 {
                     balls[i].update(ma);
