@@ -4,6 +4,7 @@ struct User
     string password;
     int fireball_power,bomb_power,lightning_power,rainbow_power,missile_power;
     int max_normal,max_timer,max_stone,max_fly;
+    int total_point=0;
 };
 void write_users(User users[] , int count)
 {

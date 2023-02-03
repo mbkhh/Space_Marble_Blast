@@ -2,6 +2,7 @@ struct Timer
 {
     Uint32 start = -3000;
     Uint32 last;
+    Uint32 save;
     void creat()
     {
         start = SDL_GetTicks();
@@ -13,6 +14,14 @@ struct Timer
     void end()
     {
         last = SDL_GetTicks() - start;
+    }
+    void stop()
+    {
+        save = SDL_GetTicks() - start;
+    }
+    void restart()
+    {
+        start = SDL_GetTicks() - save;
     }
     string get_current_time_minute()
     {

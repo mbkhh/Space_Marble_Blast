@@ -96,6 +96,14 @@ struct Ball
                 SDL_RenderCopy(renderer, secondtex, NULL, &rect);
         }
     }
+    void Draw2(SDL_Renderer *renderer , SDL_Point *mouth , Player *player)
+    {
+        rect.x = center.x - rect.w / 2;
+        rect.y = center.y - rect.w / 2;
+        SDL_Rect temp = {rect.x ,rect.y , rect.w*0.9 , rect.h*0.9 };
+        SDL_Point ce = {57 , -30};
+        SDL_RenderCopyEx(renderer, tex, NULL, &temp , (atan2(mouth->y - (player->center.y + player->rect.y), mouth->x - (player->center.x + player->rect.x)) * 180) / M_PI , &ce , SDL_FLIP_NONE);
+    }
 };
 void creat_start_balls(int count_ball, Ball balls[], int path_tatal_lenght, int ball_width ,string game_mode, SDL_Texture *Red_marble, SDL_Texture *Green_marble, SDL_Texture *Blue_marble, SDL_Texture *Yellow_marble, SDL_Texture *Red_marble_ice, SDL_Texture *Green_marble_ice, SDL_Texture *Blue_marble_ice, SDL_Texture *Yellow_marble_ice, SDL_Texture *Black_marble, SDL_Texture *Question_marble , SDL_Texture *Stone_marble)
 {

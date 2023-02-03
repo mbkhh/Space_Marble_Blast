@@ -23,6 +23,7 @@ struct Button
     {
         if (is_inside(mouth) && timer.get_current_time() > delay)
         {
+            music_player.play_chunk("click");
             timer.creat();
             return true;
         }

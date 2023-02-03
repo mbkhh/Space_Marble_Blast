@@ -31,6 +31,8 @@ enum time_modes
 
 #include "functions.hpp"
 #include "timer.hpp"
+#include "music_player.hpp"
+Music_player music_player;
 #include "player.hpp"
 #include "map.hpp"
 #include "ball.hpp"
@@ -39,23 +41,61 @@ enum time_modes
 #include "inputbox.hpp"
 #include "user.hpp"
 
-void end_game(string game_mode, int score, Timer *game_timer, int *point, int *prize)
+void end_game(string game_mode, int score, Timer *game_timer, int *point, int *prize, User users[] , int count_user , int current_user)
 {
     game_timer->end();
     int prize_chances[5] = {5, 4, 3, 2, 1};
     *prize = random(prize_chances, 5);
-    if (game_mode == "normal" || game_mode == "timer")
+    if (*prize == 0)
+        users[current_user].fireball_power++;
+    else if (*prize == 1)
+        users[current_user].bomb_power++;
+    else if (*prize == 2)
+        users[current_user].lightning_power++;
+    else if (*prize == 3)
+        users[current_user].rainbow_power++;
+    else if (*prize == 4)
+        users[current_user].missile_power++;
+    if (game_mode == "normal" )
     {
         *point = 100 * score;
         *point += 50 * (3 * 60 - (game_timer->last / 1000));
+        if(*point > users[current_user].max_normal)
+            users[current_user].max_normal = *point;
+        
     }
-    else if(game_mode == "stone")
+    else if (game_mode == "timer")
+    {
+        *point = 100 * score;
+        *point += 50 * (3 * 60 - (game_timer->last / 1000));
+        if(*point > users[current_user].max_timer)
+            users[current_user].max_timer = *point;
+    }
+    else if (game_mode == "stone")
     {
         *point = 1000 * score;
         *point += 50 * (3 * 60 - (game_timer->last / 1000));
+        if(*point > users[current_user].max_stone)
+            users[current_user].max_stone = *point;
+    }
+    write_users(users , count_user);
+}
+void make_leaderboard(User users[] , int count_user , User leaderboard_user[])
+{
+    for(int i = 0 ; i < count_user ; i++)
+    {
+        leaderboard_user[i] = users[i];
+        leaderboard_user[i].total_point = leaderboard_user[i].max_fly + leaderboard_user[i].max_timer + leaderboard_user[i].max_stone + leaderboard_user[i].max_normal; 
+    }
+    for(int i = 0 ; i < count_user ; i++)
+    {
+        for(int j  = i ; j < count_user ; j++)
+        {
+            if(leaderboard_user[j].total_point < leaderboard_user[j+1].total_point)
+                swap(leaderboard_user[j] , leaderboard_user[j+1]);
+        }
     }
 }
-
 int main(int argv, char **args)
 {
     srand(time(NULL));
@@ -71,6 +111,8 @@ int main(int argv, char **args)
     SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     if (renderer == NULL)
         std::cout << "SDL fail to create renderer . error : " << SDL_GetError() << std::endl;
+    if( Mix_OpenAudio( 44100, MIX_DEFAULT_FORMAT, 2, 2048 ) < 0 )
+        cout<<"SDL_mixer could not initialize! SDL_mixer Error: "<< Mix_GetError()<<endl;
 
     //Load resources
     SDL_Texture *Red_marble = IMG_LoadTexture(renderer, "assest/red_marble.png");
@@ -123,6 +165,18 @@ int main(int argv, char **args)
     SDL_Texture *Fly_mode_button_selected = IMG_LoadTexture(renderer, "assest/change_selected.png");
     SDL_Texture *Inputbox_norm = IMG_LoadTexture(renderer, "assest/input_box_norm.png");
     SDL_Texture *Inputbox_selected = IMG_LoadTexture(renderer, "assest/input_box_selected.png");
+    SDL_Texture *Music_change_button_norm = IMG_LoadTexture(renderer, "assest/change_norm.png");
+    SDL_Texture *Music_change_button_selected = IMG_LoadTexture(renderer, "assest/change_selected.png");
+    SDL_Texture *Musicoff_button_norm = IMG_LoadTexture(renderer, "assest/change_norm.png");
+    SDL_Texture *Musicoff_button_selected = IMG_LoadTexture(renderer, "assest/change_selected.png");
+    SDL_Texture *Soundoff_button_norm = IMG_LoadTexture(renderer, "assest/change_norm.png");
+    SDL_Texture *Soundoff_button_selected = IMG_LoadTexture(renderer, "assest/change_selected.png");
+    SDL_Texture *Help_button_norm = IMG_LoadTexture(renderer, "assest/change_norm.png");
+    SDL_Texture *Help_button_selected = IMG_LoadTexture(renderer, "assest/change_selected.png");
+    SDL_Texture *Resume_button_norm = IMG_LoadTexture(renderer, "assest/change_norm.png");
+    SDL_Texture *Resume_button_selected = IMG_LoadTexture(renderer, "assest/change_selected.png");
+    SDL_Texture *Mainmenu_button_norm = IMG_LoadTexture(renderer, "assest/change_norm.png");
+    SDL_Texture *Mainmenu_button_selected = IMG_LoadTexture(renderer, "assest/change_selected.png");
     SDL_Texture *Bomb = IMG_LoadTexture(renderer, "assest/bomb.png");
     SDL_Texture *Rainbow = IMG_LoadTexture(renderer, "assest/bomb.png");
     SDL_Texture *Fireball = IMG_LoadTexture(renderer, "assest/bomb.png");
@@ -133,6 +187,18 @@ int main(int argv, char **args)
     TTF_Font *arial_font = TTF_OpenFont("assest/arial.ttf", 24);
     TTF_Font *arial_font2 = TTF_OpenFont("assest/arial.ttf", 32);
 
+    Mix_Music *Music1 = Mix_LoadMUS("assest/The_Fathiers.wav");
+    Mix_Music *Music2 = Mix_LoadMUS("assest/Fun_With_Finn_and_Rose.wav");
+    Mix_Music *Music3 = Mix_LoadMUS("assest/Canto_Bight.wav");
+    music_player.Mclick = Mix_LoadWAV( "assest/click.wav");
+    if( Music1 == NULL )
+    {
+        printf( "Failed to load beat music! SDL_mixer Error: %s\n", Mix_GetError() );
+    }
+
+    
+    
+
     SDL_Texture *BackGround = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_UNKNOWN, SDL_TEXTUREACCESS_TARGET, screenWidth, screenHeight);
     //SDL_SetRenderDrawColor( renderer, 0, 0,255, 0 );
     //SDL_RenderClear( renderer );
@@ -141,6 +207,7 @@ int main(int argv, char **args)
     string game_mode = "stone";
     SDL_Rect fullScreen = {0, 0, screenWidth, screenHeight};
 
+    int current_music = 0;
     bool is_gameRunning = true;
     SDL_Event event;
     Uint32 frameStart;
@@ -180,6 +247,14 @@ int main(int argv, char **args)
     Stone_mode.create(Stone_mode_button_norm, Stone_mode_button_selected, 650, screenHeight / 2 - 150, 300, 300, 300);
     Button Fly_mode;
     Fly_mode.create(Fly_mode_button_norm, Fly_mode_button_selected, 970, screenHeight / 2 - 150, 300, 300, 300);
+    Button Musicoff;
+    Musicoff.create(Musicoff_button_norm, Musicoff_button_selected, screenWidth/2 - 100 , 500, 200, 100, 300);
+    Button Soundoff;
+    Soundoff.create(Soundoff_button_norm, Soundoff_button_selected, screenWidth/2 - 100 , 350, 200, 100, 300);
+    Button Help;
+    Help.create(Help_button_norm, Help_button_selected, screenWidth/2 - 100 , 350, 200, 100, 300);
+    Button Mainmenu;
+    Mainmenu.create(Mainmenu_button_norm, Mainmenu_button_selected, screenWidth/2 - 100 , 350, 200, 100, 300);
 
     Keyboard_handler input_keyboard;
     input_keyboard.delay = 3;
@@ -195,37 +270,31 @@ int main(int argv, char **args)
     int current_user  = -1;
     int count_user = 0;
     User users[100];
+    User leaderboard_user[100];
     count_user = load_users(users);
     
-    // users[0].username = "test";
-    // users[0].password = "tsetset";
-    // users[0].bomb_power = 6;
-    // users[0].missile_power = 6;
-    // users[0].rainbow_power = 6;
-    // users[0].fireball_power = 6;
-    // users[0].lightning_power = 6;
-    // users[0].max_stone = 6;
-    // users[0].max_fly = 6;
-    // users[0].max_normal = 6;
-    // users[0].max_timer = 6;
-    // count_user++;
-    // users[1].username = "mohammad";
-    // users[1].password = "moahadmsdosif";
-    // users[1].bomb_power = 6;
-    // users[1].missile_power = 6;
-    // users[1].rainbow_power = 6;
-    // users[1].fireball_power = 6;
-    // users[1].lightning_power = 6;
-    // users[1].max_stone = 6;
-    // users[1].max_fly = 6;
-    // users[1].max_normal = 6;
-    // users[1].max_timer = 6;
-    // count_user++;
-    // write_users(users , count_user);
-
+    bool music_on = true;
+    Mix_PlayMusic( Music1, 1 );
+    
     while (is_gameRunning)
     {
         frameStart = SDL_GetTicks();
+        if(Mix_PlayingMusic() == 0 )
+        {
+            if(music_on)
+            {
+                current_music++;
+                if(current_music > 2)
+                    current_music = 0;
+
+                if(current_music == 0)
+                    Mix_PlayMusic( Music1, 1 );
+                else if(current_music == 1)
+                    Mix_PlayMusic( Music2, 1 );
+                else if(current_music == 2)
+                    Mix_PlayMusic( Music3, 1 );
+            }
+        }
         while (SDL_PollEvent(&event))
         {
             switch (event.type)
@@ -309,7 +378,7 @@ int main(int argv, char **args)
         else if (mode == "login")
         {
             SDL_RenderCopy(renderer, stone_background, NULL, NULL);
-
+            
             SDL_Color text_color = {0, 0, 0};
 
             Register.rect.w = 150;
@@ -486,7 +555,7 @@ int main(int argv, char **args)
             Quit.rect.x = screenWidth/2 - Quit.rect.w /2;
             Quit.rect.y = 650;
 
-            draw_text(renderer , "Wellcome "+users[current_user].username , arial_font2 , 50 , 50, text_color.r , text_color.g , text_color.b);
+            draw_text(renderer , "Welcome "+users[current_user].username , arial_font2 , 50 , 50, text_color.r , text_color.g , text_color.b);
 
             Start.Draw(renderer, &mouth);
             Leaderboard.Draw(renderer, &mouth);
@@ -510,6 +579,7 @@ int main(int argv, char **args)
                 if (Leaderboard.is_clicked(&mouth))
                 {
                     mode = "leaderboard";
+                    make_leaderboard(users , count_user , leaderboard_user);
                     SDL_Delay(200);
                 }
                 if (Setting.is_clicked(&mouth))
@@ -525,11 +595,129 @@ int main(int argv, char **args)
         }
         else if (mode == "setting")
         {
+            SDL_RenderCopy(renderer, stone_background, NULL, NULL);
+            Help.rect.w = 250;
+            Help.rect.h = 120;
+            Help.rect.x = screenWidth/2 - Help.rect.w /2;
+            Help.rect.y = 100;
+
+            Musicoff.rect.w = 250;
+            Musicoff.rect.h = 120;
+            Musicoff.rect.x = screenWidth/2 - Musicoff.rect.w /2;
+            Musicoff.rect.y = 250;
+
+            Soundoff.rect.w = 250;
+            Soundoff.rect.h = 120;
+            Soundoff.rect.x = screenWidth/2 - Soundoff.rect.w /2;
+            Soundoff.rect.y = 400;
+
+            Mainmenu.rect.w = 250;
+            Mainmenu.rect.h = 120;
+            Mainmenu.rect.x = screenWidth/2 - Mainmenu.rect.w /2;
+            Mainmenu.rect.y = 550;
+
+            Help.Draw(renderer, &mouth);
+            Musicoff.Draw(renderer, &mouth);
+            Soundoff.Draw(renderer, &mouth);
+            Mainmenu.Draw(renderer, &mouth);
+
+            string music_status,sound_status;
+            if(music_player.is_effect_on)
+                sound_status = "ON";
+            else
+                sound_status = "OFF";
+            if(music_on)
+                music_status = "ON";
+            else
+                music_status = "OFF";
+            draw_text(renderer , sound_status, arial_font2 , 800 , Soundoff.rect.y +Soundoff.rect.h/2 -15 , 0 , 0 , 0);
+            draw_text(renderer , music_status, arial_font2 , 800 , Musicoff.rect.y +Musicoff.rect.h/2 -15 , 0 , 0 , 0);
+            if (mouthL)
+            {
+                if (Mainmenu.is_clicked(&mouth))
+                {
+                    mode = "main_menu";
+                    SDL_Delay(200);
+                }
+                if (Musicoff.is_clicked(&mouth))
+                {
+                    if(music_on)
+                    {
+                        music_on = false;
+                        Mix_HaltMusic();
+                    }
+                    else
+                        music_on = true;
+                }
+                if (Soundoff.is_clicked(&mouth))
+                {
+                    if(music_player.is_effect_on)
+                        music_player.is_effect_on = false;
+                    else
+                        music_player.is_effect_on = true;
+                }
+                if (Help.is_clicked(&mouth))
+                {
+                    mode = "help";
+                    SDL_Delay(200);
+                }
+            }
+        }
+        else if (mode == "help")
+        {
+            SDL_RenderCopy(renderer, stone_background, NULL, NULL);
+            Mainmenu.rect.w = 250;
+            Mainmenu.rect.h = 120;
+            Mainmenu.rect.x = 100;
+            Mainmenu.rect.y = 550;
+            Mainmenu.Draw(renderer, &mouth);
+            draw_text(renderer , "Every thing is completely obvious", arial_font2 , 50 , 50 , 0 , 0 , 0 , 1.5 , 1.5);
+            draw_text(renderer , "This game is created by Mohammad bagher khandan (MBKH)", arial_font2 , 50 , 150 , 0 , 0 , 0 , 1.5 , 1.5);
+            if (mouthL)
+            {
+                if (Mainmenu.is_clicked(&mouth))
+                {
+                    mode = "main_menu";
+                    SDL_Delay(200);
+                }
+            }
 
         }
         else if (mode == "leaderboard")
         {
-
+            SDL_RenderCopy(renderer, stone_background, NULL, NULL);
+            draw_text(renderer , "Rank", arial_font2 , 50 , 43 , 0 , 0 , 0);
+            draw_text(renderer , "Username", arial_font , 150 , 50 , 0 , 0 , 0);
+            draw_text(renderer , "Normal Mode", arial_font , 400 , 50 , 0 , 0 , 0);
+            draw_text(renderer , "Timer Mode", arial_font , 550 , 50 , 0 , 0 , 0);
+            draw_text(renderer , "Stone Mode", arial_font , 700 , 50 , 0 , 0 , 0);
+            draw_text(renderer , "Fly Mode", arial_font , 850 , 50 , 0 , 0 , 0);
+            draw_text(renderer , "Total Point", arial_font2 , 1000 , 43 , 0 , 0 , 0);
+            Mainmenu.rect.w = 150;
+            Mainmenu.rect.h = 90;
+            Mainmenu.rect.x = screenWidth - 200;
+            Mainmenu.rect.y = 650;
+            Mainmenu.Draw(renderer, &mouth);
+            SDL_SetRenderDrawColor(renderer , 0 , 0 , 0 , 0);
+            for(int i = 0 ; i < count_user ; i++)
+            {
+                SDL_RenderDrawLine(renderer , 20 , 90 + i*60 , screenWidth - 20 , 90 + i*60);
+                draw_text(renderer , to_string(i+1) , arial_font2 , 50 , 93 + i*60 , 0 , 0 , 0);
+                draw_text(renderer , leaderboard_user[i].username , arial_font , 150 , 100 + i*60 , 0 , 0 , 0);
+                draw_text(renderer , to_string(leaderboard_user[i].max_normal) , arial_font , 400 , 100 + i*60 , 0 , 0 , 0);
+                draw_text(renderer , to_string(leaderboard_user[i].max_timer) , arial_font , 550 , 100 + i*60 , 0 , 0 , 0);
+                draw_text(renderer , to_string(leaderboard_user[i].max_stone) , arial_font , 700 , 100 + i*60 , 0 , 0 , 0);
+                draw_text(renderer , to_string(leaderboard_user[i].max_fly) , arial_font , 850 , 100 + i*60 , 0 , 0 , 0);
+                draw_text(renderer , to_string(leaderboard_user[i].total_point) , arial_font2 , 1000 , 95 + i*60 , 0 , 0 , 0);
+            }
+            if (mouthL)
+            {
+                if (Mainmenu.is_clicked(&mouth))
+                {
+                    mode = "main_menu";
+                    SDL_Delay(200);
+                }
+            }
         }
         else if (mode == "choose_mode")
         {
@@ -627,6 +815,7 @@ int main(int argv, char **args)
                 if (Leaderboard.is_clicked(&mouth))
                 {
                     mode = "leaderboard";
+                    make_leaderboard(users , count_user , leaderboard_user);
                     SDL_Delay(200);
                 }
                 if (Quit.is_clicked(&mouth))
@@ -644,7 +833,7 @@ int main(int argv, char **args)
         {
             bool is_ingame = true;
             Player player;
-            player.creat(Cannon, screenWidth / 2, 300, 200, 80, 40, 40);
+            player.creat(Cannon, screenWidth / 2, 600, 260, 131, 58, 58);
             map ma;
             ma.total_lenght = 0;
             ma.tex = PathTex;
@@ -698,6 +887,17 @@ int main(int argv, char **args)
             Button fireball_power;
             fireball_power.create(Fireball_power_button_norm, Fireball_power_button_selected, screenWidth - 100, screenHeight / 2 - 200, 70, 50, 300);
 
+            Button Musicoff;
+            Musicoff.create(Musicoff_button_norm, Musicoff_button_selected, screenWidth/2 - 100 , 500, 200, 100, 300);
+            Button Soundoff;
+            Soundoff.create(Soundoff_button_norm, Soundoff_button_selected, screenWidth/2 - 100 , 350, 200, 100, 300);
+            Button Music_change;
+            Music_change.create(Music_change_button_norm, Music_change_button_selected, screenWidth/2 - 100 , 200, 200, 100, 300);
+            Button Mainmenu;
+            Mainmenu.create(Mainmenu_button_norm, Mainmenu_button_selected, screenWidth/2 - 100 , 650, 200, 100, 300);
+            Button Resume;
+            Resume.create(Resume_button_norm, Resume_button_selected, screenWidth/2 - 100 , 50, 200, 100, 300);
+
             Timer bullet_shoot;
             Timer time_effect_timer;
 
@@ -713,9 +913,27 @@ int main(int argv, char **args)
 
             score = 0;
             game_timer.creat();
+            bool is_stop = false;
+            bool is_down_esc = false;
             while (is_ingame)
             {
                 frameStart = SDL_GetTicks();
+                if(Mix_PlayingMusic() == 0 )
+                {
+                    if(music_on)
+                    {
+                        current_music++;
+                        if(current_music > 2)
+                            current_music = 0;
+
+                        if(current_music == 0)
+                            Mix_PlayMusic( Music1, 1 );
+                        else if(current_music == 1)
+                            Mix_PlayMusic( Music2, 1 );
+                        else if(current_music == 2)
+                            Mix_PlayMusic( Music3, 1 );
+                    }
+                }
                 while (SDL_PollEvent(&event))
                 {
                     switch (event.type)
@@ -736,170 +954,264 @@ int main(int argv, char **args)
                             mouthL = false;
                         break;
                     case SDL_KEYDOWN:
-                        if (event.key.keysym.sym == SDLK_q)
-                        {
-                            is_ingame = false;
-                        }
                         game_keyboard.keydown(&event);
+                        if (event.key.keysym.sym == SDLK_ESCAPE && !is_down_esc)
+                        {
+                            is_down_esc = true;
+                            if(is_stop)
+                            {
+                                is_stop = false;
+                                game_timer.restart();
+                                time_effect_timer.restart();
+                            }
+                            else
+                            {
+                                is_stop = true;
+                                game_timer.stop();
+                                time_effect_timer.stop();
+                            }
+                        }
                     case SDL_KEYUP:
                         game_keyboard.keyup(&event);
+                        if (event.key.keysym.sym == SDLK_ESCAPE)
+                            is_down_esc = false;
                         break;
                     }
                 }
                 SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
                 SDL_RenderClear(renderer);
-                SDL_RenderCopy(renderer, BackGround, NULL, NULL);
-                player.Draw(renderer, &mouth);
-
-                if (current_time_mode != NONE)
-                    if (time_effect_timer.get_current_time() > 5000)
-                        current_time_mode = NONE;
-
-                if (current_time_mode == NONE)
-                    balls_v = normal_speed;
-                else if (current_time_mode == SLOWMO)
-                    balls_v = normal_speed / 2;
-                else if (current_time_mode == STOP)
-                    balls_v = 0;
-                else if (current_time_mode == REVERSE)
-                    balls_v = -1 * normal_speed;
-                handle_map_balls(count_ball, balls, balls_v, &ma);
-                for (int i = 0; i < count_ball; i++)
+                if(is_stop)
                 {
-                    if (balls[i].time_effect_mode == NONE)
-                        balls[i].Draw(renderer);
-                    else if (balls[i].time_effect_mode == STOP)
-                        balls[i].Draw(renderer, true, Stop_power);
-                    else if (balls[i].time_effect_mode == SLOWMO)
-                        balls[i].Draw(renderer, true, Slowmo_power);
-                    else if (balls[i].time_effect_mode == REVERSE)
-                        balls[i].Draw(renderer, true, Reverse_power);
-                    if (balls[i].color == "Red" || balls[i].color == "Yellow" || balls[i].color == "Blue" || balls[i].color == "Green")
+                    SDL_RenderCopy(renderer, stone_background, NULL, NULL);
+                    Resume.Draw(renderer , &mouth);
+                    Mainmenu.Draw(renderer , &mouth);
+                    Music_change.Draw(renderer , &mouth);
+                    Musicoff.Draw(renderer , &mouth);
+                    Soundoff.Draw(renderer , &mouth);
+                    string music_status,sound_status;
+                    if(music_player.is_effect_on)
+                        sound_status = "ON";
+                    else
+                        sound_status = "OFF";
+                    if(music_on)
+                        music_status = "ON";
+                    else
+                        music_status = "OFF";
+                    draw_text(renderer , sound_status, arial_font2 , 800 , Soundoff.rect.y +Soundoff.rect.h/2 -15 , 0 , 0 , 0);
+                    draw_text(renderer , music_status, arial_font2 , 800 , Musicoff.rect.y +Musicoff.rect.h/2 -15 , 0 , 0 , 0);
+                    if(mouthL)
                     {
-                        int timeE = random(time_effect_chance, 4);
-                        if (timeE != 0)
+                        if (Resume.is_clicked(&mouth))
                         {
-                            balls[i].time_effect_mode = timeE;
-                            balls[i].time_effect_timer.creat();
+                            SDL_Delay(150);
+                            is_stop = false;
+                            game_timer.restart();
+                            time_effect_timer.restart();
                         }
-                    }
-                    if (balls[i].current_loc > ma.total_lenght && balls[i].color != "Stone")
-                    {
-                        is_ingame = false;
-                        mode = "end_game";
-                        end_game(game_mode, score, &game_timer, &point, &prize);
-                    }
-
-                    if(balls[i].color == "Stone" && i + 1 == count_ball && balls[i].normal_v == 0)
-                    {
-                        balls[i].normal_v = 11;
-                        balls[i].current_loc += 10;
-                        balls[i].leftConnnected = false;
-                    }
-                    if(balls[i].current_loc > ma.total_lenght && balls[i].color == "Stone")
-                    {
-                        count_ball--;
-                        score++;
-                    }
-                    //cout<<balls[i].leftConnnected<<balls[i].rightConnnected<<" ";
-                    // cout<<balls[i].current_loc<<" ";
-                }
-                //cout<<endl;
-                if (game_mode == "normal" || game_mode == "timer" || game_mode == "stone")
-                {
-                    if (count_ball == 0)
-                    {
-                        is_ingame = false;
-                        mode = "end_game";
-                        end_game(game_mode, score, &game_timer, &point, &prize);
-                    }
-                }
-                if(game_mode == "stone" && score == 10)
-                {
-                    is_ingame = false;
-                    mode = "end_game";
-                    end_game(game_mode, score, &game_timer, &point, &prize);
-                }
-                if ((max_timer_mode_lenght - (game_timer.get_current_time() - game_timer.start)) <= 0)
-                {
-                    is_ingame = false;
-                    mode = "end_game";
-                    end_game(game_mode, score, &game_timer, &point, &prize);
-                }
-
-                if (!bomb_power.is_inside(&mouth) && !rainbow_pawer.is_inside(&mouth) && !fireball_power.is_inside(&mouth) && ((mouthL && in_air_count == 0) || (mouthL && bullet.is_in_cannon && in_air_count < 20 && bullet_shoot.get_current_time() > 600)))
-                {
-                    bullet.shoot(&mouth);
-                    in_air_balls[in_air_count] = bullet;
-                    bullet_shoot.creat();
-                    in_air_count++;
-                    bullet = bullet2;
-                    make_cannon_ball(count_ball, balls, &bullet2, balls_width, bullet_speed, &player, Red_marble, Green_marble, Blue_marble, Yellow_marble);
-                }
-
-                bullet.update();
-                bullet.Draw(renderer);
-                int deleted_index = -1;
-                for (int i = 0; i < in_air_count; i++)
-                {
-                    in_air_balls[i].update();
-                    in_air_balls[i].Draw(renderer);
-                    if (in_air_balls[i].is_out())
-                        deleted_index = i;
-                    for (int j = 0; j < count_ball; j++)
-                    {
-                        if (check_ball_collision(&in_air_balls[i], &balls[j]))
+                        if (Mainmenu.is_clicked(&mouth))
                         {
-                            collision(balls, &count_ball, j, &in_air_balls[i], &ma, balls_v, balls_width, &current_time_mode, &time_effect_timer, &score , game_mode);
-                            deleted_index = i;
-                            break;
+                            SDL_Delay(150);
+                            is_ingame = false;
+                            mode = "main_menu";
+                        }
+                        if (Soundoff.is_clicked(&mouth))
+                        {
+                            if(music_player.is_effect_on)
+                                music_player.is_effect_on = false;
+                            else
+                                music_player.is_effect_on = true;
+                        }
+                        if (Music_change.is_clicked(&mouth))
+                        {
+                            Mix_HaltMusic();
+                        }
+                        if (Musicoff.is_clicked(&mouth))
+                        {
+                            if(music_on)
+                            {
+                                music_on = false;
+                                Mix_HaltMusic();
+                            }
+                            else
+                                music_on = true;
                         }
                     }
                 }
-                if (game_keyboard.get_current() != '!')
-                {
-                    if (game_keyboard.curruntK == ' ')
-                    {
-                        Ball temp;
-                        temp = bullet2;
-                        bullet2 = bullet;
-                        bullet = temp;
-                    }
-                }
-                if (deleted_index != -1)
-                {
-                    delete_ball(in_air_balls, in_air_count, deleted_index);
-                    in_air_count--;
-                }
-                bomb_power.Draw(renderer, &mouth);
-                rainbow_pawer.Draw(renderer, &mouth);
-                fireball_power.Draw(renderer, &mouth);
-
-                if (mouthL)
-                {
-                    if (bomb_power.is_clicked(&mouth))
-                    {
-                        bullet.creat_cannon_ball(Bomb, "Bomb", &player, balls_width, bullet_speed);
-                    }
-                    if (rainbow_pawer.is_clicked(&mouth))
-                    {
-                        bullet.creat_cannon_ball(Rainbow, "Rainbow", &player, balls_width, bullet_speed);
-                    }
-                    if (fireball_power.is_clicked(&mouth))
-                    {
-                        bullet.creat_cannon_ball(Fireball, "Fireball", &player, balls_width, bullet_speed);
-                        bullet2.creat_cannon_ball(Fireball, "Fireball", &player, balls_width, bullet_speed);
-                    }
-                }
-
-                if (game_mode == "timer")
-                    current_time = game_timer.reverse_get_current_time(max_timer_mode_lenght);
                 else
-                    current_time = game_timer.get_current_time_minute();
+                {
+                    SDL_RenderCopy(renderer, BackGround, NULL, NULL);
 
-                draw_text(renderer , current_time, arial_font , screenWidth - 100, 30, timer_color.r , timer_color.g , timer_color.b);
-                draw_text(renderer , to_string(score), arial_font , 50, 30, score_color.r , score_color.g , score_color.b);
+                    if (current_time_mode != NONE)
+                        if (time_effect_timer.get_current_time() > 5000)
+                            current_time_mode = NONE;
 
+                    if (current_time_mode == NONE)
+                        balls_v = normal_speed;
+                    else if (current_time_mode == SLOWMO)
+                        balls_v = normal_speed / 2;
+                    else if (current_time_mode == STOP)
+                        balls_v = 0;
+                    else if (current_time_mode == REVERSE)
+                        balls_v = -1 * normal_speed;
+                    handle_map_balls(count_ball, balls, balls_v, &ma);
+                    for (int i = 0; i < count_ball; i++)
+                    {
+                        if (balls[i].time_effect_mode == NONE)
+                            balls[i].Draw(renderer);
+                        else if (balls[i].time_effect_mode == STOP)
+                            balls[i].Draw(renderer, true, Stop_power);
+                        else if (balls[i].time_effect_mode == SLOWMO)
+                            balls[i].Draw(renderer, true, Slowmo_power);
+                        else if (balls[i].time_effect_mode == REVERSE)
+                            balls[i].Draw(renderer, true, Reverse_power);
+                        if (balls[i].color == "Red" || balls[i].color == "Yellow" || balls[i].color == "Blue" || balls[i].color == "Green")
+                        {
+                            int timeE = random(time_effect_chance, 4);
+                            if (timeE != 0)
+                            {
+                                balls[i].time_effect_mode = timeE;
+                                balls[i].time_effect_timer.creat();
+                            }
+                        }
+                        if (balls[i].current_loc > ma.total_lenght && balls[i].color != "Stone")
+                        {
+                            is_ingame = false;
+                            mode = "end_game";
+                            end_game(game_mode, score, &game_timer, &point, &prize , users , count_user , current_user);
+                        }
+
+                        if(balls[i].color == "Stone" && i + 1 == count_ball && balls[i].normal_v == 0)
+                        {
+                            balls[i].normal_v = 11;
+                            balls[i].current_loc += 10;
+                            balls[i].leftConnnected = false;
+                        }
+                        if(balls[i].current_loc > ma.total_lenght && balls[i].color == "Stone")
+                        {
+                            count_ball--;
+                            score++;
+                        }
+                        //cout<<balls[i].leftConnnected<<balls[i].rightConnnected<<" ";
+                        // cout<<balls[i].current_loc<<" ";
+                    }
+                    //cout<<endl;
+                    if (game_mode == "normal" || game_mode == "timer" || game_mode == "stone")
+                    {
+                        if (count_ball == 0)
+                        {
+                            is_ingame = false;
+                            mode = "end_game";
+                            end_game(game_mode, score, &game_timer, &point, &prize , users , count_user , current_user);
+                        }
+                    }
+                    if(game_mode == "stone" && score == 10)
+                    {
+                        is_ingame = false;
+                        mode = "end_game";
+                        end_game(game_mode, score, &game_timer, &point, &prize , users , count_user , current_user);
+                    }
+                    if ((max_timer_mode_lenght - (game_timer.get_current_time() - game_timer.start)) <= 0)
+                    {
+                        is_ingame = false;
+                        mode = "end_game";
+                        end_game(game_mode, score, &game_timer, &point, &prize , users , count_user , current_user);
+                    }
+
+                    if (!bomb_power.is_inside(&mouth) && !rainbow_pawer.is_inside(&mouth) && !fireball_power.is_inside(&mouth) && ((mouthL && in_air_count == 0) || (mouthL && bullet.is_in_cannon && in_air_count < 20 && bullet_shoot.get_current_time() > 600)))
+                    {
+                        bullet.shoot(&mouth);
+                        in_air_balls[in_air_count] = bullet;
+                        bullet_shoot.creat();
+                        in_air_count++;
+                        bullet = bullet2;
+                        bullet.center.x = player.center.x + player.rect.x;
+                        bullet.center.y = player.center.y + player.rect.y;
+                        make_cannon_ball(count_ball, balls, &bullet2, balls_width, bullet_speed, &player, Red_marble, Green_marble, Blue_marble, Yellow_marble);
+                    }
+
+                    bullet.update();
+                    bullet.Draw(renderer);
+
+                    bullet2.center.x = player.rect.x + 25;
+                    bullet2.center.y = player.rect.y + player.rect.h - 20;
+                    
+                    int deleted_index = -1;
+                    for (int i = 0; i < in_air_count; i++)
+                    {
+                        in_air_balls[i].update();
+                        in_air_balls[i].Draw(renderer);
+                        if (in_air_balls[i].is_out())
+                            deleted_index = i;
+                        for (int j = 0; j < count_ball; j++)
+                        {
+                            if (check_ball_collision(&in_air_balls[i], &balls[j]))
+                            {
+                                collision(balls, &count_ball, j, &in_air_balls[i], &ma, balls_v, balls_width, &current_time_mode, &time_effect_timer, &score , game_mode);
+                                deleted_index = i;
+                                break;
+                            }
+                        }
+                    }
+                    bullet2.Draw2(renderer , &mouth , &player);
+                    player.Draw(renderer, &mouth);
+                    if (game_keyboard.get_current() != '!')
+                    {
+                        if (game_keyboard.curruntK == ' ')
+                        {
+                            Ball temp;
+                            temp = bullet2;
+                            bullet2 = bullet;
+                            bullet = temp;
+                            bullet.center.x = player.center.x + player.rect.x;
+                            bullet.center.y = player.center.y + player.rect.y;
+                        }
+                    }
+                    if (deleted_index != -1)
+                    {
+                        delete_ball(in_air_balls, in_air_count, deleted_index);
+                        in_air_count--;
+                    }
+                    bomb_power.Draw(renderer, &mouth);
+                    rainbow_pawer.Draw(renderer, &mouth);
+                    fireball_power.Draw(renderer, &mouth);
+
+                    if (mouthL)
+                    {
+                        if (bomb_power.is_clicked(&mouth))
+                        {
+                            if(users[current_user].bomb_power > 0 )
+                            {    
+                                bullet.creat_cannon_ball(Bomb, "Bomb", &player, balls_width, bullet_speed);
+                                users[current_user].bomb_power--;
+                            }
+                        }
+                        if (rainbow_pawer.is_clicked(&mouth))
+                        {
+                            if(users[current_user].rainbow_power > 0)
+                            {
+                                bullet.creat_cannon_ball(Rainbow, "Rainbow", &player, balls_width, bullet_speed);
+                                users[current_user].rainbow_power--;
+                            }
+                        }
+                        if (fireball_power.is_clicked(&mouth))
+                        {
+                            if(users[current_user].fireball_power > 0)
+                            {
+                                bullet.creat_cannon_ball(Fireball, "Fireball", &player, balls_width, bullet_speed);
+                                bullet2.creat_cannon_ball(Fireball, "Fireball", &player, balls_width, bullet_speed);
+                                users[current_user].fireball_power--;
+                            }
+                        }
+                    }
+
+                    if (game_mode == "timer")
+                        current_time = game_timer.reverse_get_current_time(max_timer_mode_lenght);
+                    else
+                        current_time = game_timer.get_current_time_minute();
+
+                    draw_text(renderer , current_time, arial_font , screenWidth - 100, 30, timer_color.r , timer_color.g , timer_color.b);
+                    draw_text(renderer , to_string(score), arial_font , 50, 30, score_color.r , score_color.g , score_color.b);
+                }
                 SDL_RenderPresent(renderer);
                 frameTime = SDL_GetTicks() - frameStart;
                 if (frameTime < frameDelay)
