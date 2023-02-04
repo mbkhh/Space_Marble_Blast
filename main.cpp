@@ -40,6 +40,7 @@ Music_player music_player;
 #include "button.hpp"
 #include "inputbox.hpp"
 #include "user.hpp"
+#include "missile.hpp"
 
 void end_game(string game_mode, int score, Timer *game_timer, int *point, int *prize, User users[] , int count_user , int current_user)
 {
@@ -58,7 +59,7 @@ void end_game(string game_mode, int score, Timer *game_timer, int *point, int *p
         users[current_user].missile_power++;
     if (game_mode == "normal" )
     {
-        *point = 100 * score;
+        *point = 150 * score;
         *point += 50 * (3 * 60 - (game_timer->last / 1000));
         if(*point > users[current_user].max_normal)
             users[current_user].max_normal = *point;
@@ -66,17 +67,24 @@ void end_game(string game_mode, int score, Timer *game_timer, int *point, int *p
     }
     else if (game_mode == "timer")
     {
-        *point = 100 * score;
+        *point = 150 * score;
         *point += 50 * (3 * 60 - (game_timer->last / 1000));
         if(*point > users[current_user].max_timer)
             users[current_user].max_timer = *point;
     }
     else if (game_mode == "stone")
     {
-        *point = 1000 * score;
+        *point = 2000 * score;
         *point += 50 * (3 * 60 - (game_timer->last / 1000));
         if(*point > users[current_user].max_stone)
             users[current_user].max_stone = *point;
+    }
+    else if (game_mode == "fly")
+    {
+        *point = 2000 * score;
+        *point += 50 * (3 * 60 - (game_timer->last / 1000));
+        if(*point > users[current_user].max_fly)
+            users[current_user].max_fly = *point;
     }
     write_users(users , count_user);
 }
@@ -126,6 +134,8 @@ int main(int argv, char **args)
     SDL_Texture *Black_marble = IMG_LoadTexture(renderer, "assest/black_marble.png");
     SDL_Texture *Question_marble = IMG_LoadTexture(renderer, "assest/question_marble.png");
     SDL_Texture *Stone_marble = IMG_LoadTexture(renderer, "assest/stone_marble.png");
+    SDL_Texture *Fly_marble = IMG_LoadTexture(renderer, "assest/fly_marble.png");
+    SDL_Texture *Fly_gone_marble = IMG_LoadTexture(renderer, "assest/fly_marble.png");
     SDL_Texture *stone_background = IMG_LoadTexture(renderer, "assest/stone_background.jpg");
     SDL_Texture *Cannon = IMG_LoadTexture(renderer, "assest/cannon.png");
     SDL_Texture *PathTex = IMG_LoadTexture(renderer, "assest/path2.png");
@@ -135,6 +145,10 @@ int main(int argv, char **args)
     SDL_Texture *Rainbow_power_button_selected = IMG_LoadTexture(renderer, "assest/change_selected.png");
     SDL_Texture *Fireball_power_button_norm = IMG_LoadTexture(renderer, "assest/change_norm.png");
     SDL_Texture *Fireball_power_button_selected = IMG_LoadTexture(renderer, "assest/change_selected.png");
+    SDL_Texture *Lightning_power_button_norm = IMG_LoadTexture(renderer, "assest/change_norm.png");
+    SDL_Texture *Lightning_power_button_selected = IMG_LoadTexture(renderer, "assest/change_selected.png");
+    SDL_Texture *Missile_power_button_norm = IMG_LoadTexture(renderer, "assest/change_norm.png");
+    SDL_Texture *Missile_power_button_selected = IMG_LoadTexture(renderer, "assest/change_selected.png");
     SDL_Texture *Quit_button_norm = IMG_LoadTexture(renderer, "assest/change_norm.png");
     SDL_Texture *Quit_button_selected = IMG_LoadTexture(renderer, "assest/change_selected.png");
     SDL_Texture *Login_button_norm = IMG_LoadTexture(renderer, "assest/change_norm.png");
@@ -183,6 +197,7 @@ int main(int argv, char **args)
     SDL_Texture *Slowmo_power = IMG_LoadTexture(renderer, "assest/slowmo_power.png");
     SDL_Texture *Stop_power = IMG_LoadTexture(renderer, "assest/pause_power.png");
     SDL_Texture *Reverse_power = IMG_LoadTexture(renderer, "assest/reverse_power.png");
+    SDL_Texture *Missle_tex = IMG_LoadTexture(renderer, "assest/missile.png");
 
     TTF_Font *arial_font = TTF_OpenFont("assest/arial.ttf", 24);
     TTF_Font *arial_font2 = TTF_OpenFont("assest/arial.ttf", 32);
@@ -195,9 +210,6 @@ int main(int argv, char **args)
     {
         printf( "Failed to load beat music! SDL_mixer Error: %s\n", Mix_GetError() );
     }
-
-    
-    
 
     SDL_Texture *BackGround = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_UNKNOWN, SDL_TEXTUREACCESS_TARGET, screenWidth, screenHeight);
     //SDL_SetRenderDrawColor( renderer, 0, 0,255, 0 );
@@ -833,7 +845,7 @@ int main(int argv, char **args)
         {
             bool is_ingame = true;
             Player player;
-            player.creat(Cannon, screenWidth / 2, 600, 260, 131, 58, 58);
+            player.creat(Cannon, screenWidth / 2 - 200, 600, 260, 121, 54, 61);
             map ma;
             ma.total_lenght = 0;
             ma.tex = PathTex;
@@ -841,9 +853,12 @@ int main(int argv, char **args)
             ma.p2 = {screenWidth / 2 - 200, screenHeight / 2};
             ma.p3 = {0, 0};
             ma.p4 = {screenWidth / 4, 100};
-            ma.p6 = {screenWidth, 0};
             ma.p5 = {screenWidth / 2, 200};
+            ma.p6 = {screenWidth, 0};
             ma.p7 = {screenWidth - 100, screenHeight - 100};
+            ma.p8 = {screenWidth - 200 ,screenHeight +200};
+            ma.p9 = {screenWidth/2 , 400};
+            ma.p10 = {screenWidth/2 , 200};
 
             SDL_SetRenderTarget(renderer, BackGround);
             SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
@@ -862,7 +877,7 @@ int main(int argv, char **args)
             double balls_v = 1;
             int count_ball = 80;
             Ball balls[200];
-            creat_start_balls(count_ball, balls, ma.total_lenght, balls_width , game_mode , Red_marble, Green_marble, Blue_marble, Yellow_marble, Red_marble_ice, Green_marble_ice, Blue_marble_ice, Yellow_marble_ice, Black_marble, Question_marble , Stone_marble);
+            creat_start_balls(count_ball, balls, ma.total_lenght, balls_width , game_mode , Red_marble, Green_marble, Blue_marble, Yellow_marble, Red_marble_ice, Green_marble_ice, Blue_marble_ice, Yellow_marble_ice, Black_marble, Question_marble, Stone_marble, Fly_marble);
             //balls[29].current_loc = 800;
             //balls[28].time_effect_mode = REVERSE;
             //balls[28].time_effect_timer.creat();
@@ -887,6 +902,12 @@ int main(int argv, char **args)
             Button fireball_power;
             fireball_power.create(Fireball_power_button_norm, Fireball_power_button_selected, screenWidth - 100, screenHeight / 2 - 200, 70, 50, 300);
 
+            //Button fireball_power;
+            //fireball_power.create(Fireball_power_button_norm, Fireball_power_button_selected, screenWidth - 100, screenHeight / 2 + 100, 70, 50, 300);
+
+            Button Missile_power;
+            Missile_power.create(Missile_power_button_norm, Missile_power_button_selected, screenWidth - 100, screenHeight / 2 + 200, 70, 50, 300);
+
             Button Musicoff;
             Musicoff.create(Musicoff_button_norm, Musicoff_button_selected, screenWidth/2 - 100 , 500, 200, 100, 300);
             Button Soundoff;
@@ -906,6 +927,9 @@ int main(int argv, char **args)
 
             SDL_Color score_color = {0, 255, 0};
 
+
+            Missile missile;
+            missile.create(Missle_tex , -100 , -100 , 100 , 100 , 10 , 10 , 450 , 450);
             Keyboard_handler game_keyboard;
             game_keyboard.delay = 500;
             int time_effect_chance[4] = {20000, 1, 1, 1};
@@ -1095,7 +1119,7 @@ int main(int argv, char **args)
                         // cout<<balls[i].current_loc<<" ";
                     }
                     //cout<<endl;
-                    if (game_mode == "normal" || game_mode == "timer" || game_mode == "stone")
+                    if (game_mode == "normal" || game_mode == "timer" || game_mode == "stone" || game_mode == "fly")
                     {
                         if (count_ball == 0)
                         {
@@ -1104,7 +1128,7 @@ int main(int argv, char **args)
                             end_game(game_mode, score, &game_timer, &point, &prize , users , count_user , current_user);
                         }
                     }
-                    if(game_mode == "stone" && score == 10)
+                    if((game_mode == "stone" && score == 10) || (game_mode == "fly" && score == 10))
                     {
                         is_ingame = false;
                         mode = "end_game";
@@ -1132,8 +1156,8 @@ int main(int argv, char **args)
                     bullet.update();
                     bullet.Draw(renderer);
 
-                    bullet2.center.x = player.rect.x + 25;
-                    bullet2.center.y = player.rect.y + player.rect.h - 20;
+                    bullet2.center.x = player.rect.x + 32;
+                    bullet2.center.y = player.rect.y + player.rect.h - 10;
                     
                     int deleted_index = -1;
                     for (int i = 0; i < in_air_count; i++)
@@ -1174,6 +1198,7 @@ int main(int argv, char **args)
                     bomb_power.Draw(renderer, &mouth);
                     rainbow_pawer.Draw(renderer, &mouth);
                     fireball_power.Draw(renderer, &mouth);
+                    Missile_power.Draw(renderer, &mouth);
 
                     if (mouthL)
                     {
@@ -1193,6 +1218,15 @@ int main(int argv, char **args)
                                 users[current_user].rainbow_power--;
                             }
                         }
+                        if (Missile_power.is_clicked(&mouth))
+                        {
+                            if(users[current_user].missile_power > 0 && !missile.is_lounched)
+                            {
+                                users[current_user].missile_power--;
+                                missile.create(Missle_tex , -100 , -100 , 100 , 100 , 7 , 7 , 450 , 450);
+                                missile.lounch();
+                            }
+                        }
                         if (fireball_power.is_clicked(&mouth))
                         {
                             if(users[current_user].fireball_power > 0)
@@ -1203,7 +1237,9 @@ int main(int argv, char **args)
                             }
                         }
                     }
-
+                    missile.update();
+                    missile.hit(balls , &count_ball , &score , game_mode);
+                    missile.Draw(renderer);
                     if (game_mode == "timer")
                         current_time = game_timer.reverse_get_current_time(max_timer_mode_lenght);
                     else

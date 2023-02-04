@@ -7,7 +7,7 @@ struct Inputbox
     SDL_Rect rect;
     SDL_Color text_color;
     SDL_Rect text_rect;
-    void create(SDL_Texture *norm_texture , SDL_Texture *selected_texture ,int x , int y , int w , int h , int margin , int R , int G , int B)
+    void create(SDL_Texture *norm_texture , SDL_Texture *selected_texture ,int x , int y , int w , int h , int margin , Uint8 R , Uint8 G , Uint8 B)
     {
         norm_tex = norm_texture;
         selected_tex = selected_texture;

@@ -1,13 +1,19 @@
 struct map
 {
-    SDL_Point p1, p2, p3, p4, p5, p6, p7;
+    SDL_Point p1, p2, p3, p4, p5, p6, p7 , p8 , p9 , p10;
     SDL_Texture *tex;
     double total_lenght;
-    double distance_samples[2000];
+    double distance_samples[3000];
     void get_point(int t, SDL_Point *x = nullptr, double *x2 = nullptr, double *y2 = nullptr)
     {
         double X, Y;
-        if (t > 1000)
+        if (t > 2000)
+        {
+            t -= 2000;
+            X = pow((1.0 - t / 1000.0), 3) * p7.x + 3 * pow((1.0 - t / 1000.0), 2) * (t / 1000.0) * p8.x + 3 * (1.0 - t / 1000.0) * pow(t / 1000.0, 2) * p9.x + pow(t / 1000.0, 3) * p10.x;
+            Y = pow((1.0 - t / 1000.0), 3) * p7.y + 3 * pow((1.0 - t / 1000.0), 2) * (t / 1000.0) * p8.y + 3 * (1.0 - t / 1000.0) * pow(t / 1000.0, 2) * p9.y + pow(t / 1000.0, 3) * p10.y;
+        }
+        else if (t > 1000)
         {
             t -= 1000;
             X = pow((1.0 - t / 1000.0), 3) * p4.x + 3 * pow((1.0 - t / 1000.0), 2) * (t / 1000.0) * p5.x + 3 * (1.0 - t / 1000.0) * pow(t / 1000.0, 2) * p6.x + pow(t / 1000.0, 3) * p7.x;
@@ -33,7 +39,7 @@ struct map
     {
         if (lastT < 0)
             lastT = 0;
-        for (int i = lastT; i < 1999; i++)
+        for (int i = lastT; i < 2999; i++)
             if (distance >= distance_samples[i] && distance < distance_samples[i + 1])
                 return i;
         return -1;
@@ -48,7 +54,7 @@ struct map
         x1 = p_last.x;
         y1 = p_last.y;
         distance_samples[0] = 0;
-        while (t < 2000)
+        while (t < 3000)
         {
             get_point(t, &p, &x2, &y2);
             //get_point(t + 1, nullptr, &x2, &y2);
