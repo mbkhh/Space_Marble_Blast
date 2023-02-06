@@ -30,10 +30,10 @@ struct Ball
         color = mode;
         rect = {0, 0, width, width};
     }
-    void shoot(SDL_Point *mouth)
+    void shoot(SDL_Point *mouse)
     {
         is_in_cannon = false;
-        angle = atan2((double)mouth->y - center.y, (double)mouth->x - center.x);
+        angle = atan2((double)mouse->y - center.y, (double)mouse->x - center.x);
         v_x = cos(angle) * velocity;
         v_y = sin(angle) * velocity;
     }
@@ -96,13 +96,13 @@ struct Ball
                 SDL_RenderCopy(renderer, secondtex, NULL, &rect);
         }
     }
-    void Draw2(SDL_Renderer *renderer , SDL_Point *mouth , Player *player)
+    void Draw2(SDL_Renderer *renderer , SDL_Point *mouse , Player *player)
     {
         rect.x = center.x - rect.w / 2;
         rect.y = center.y - rect.w / 2;
         SDL_Rect temp = {rect.x ,rect.y , rect.w*0.6 , rect.h*0.6 };
         SDL_Point ce = {46 , -25};
-        SDL_RenderCopyEx(renderer, tex, NULL, &temp , (atan2(mouth->y - (player->center.y + player->rect.y), mouth->x - (player->center.x + player->rect.x)) * 180) / M_PI , &ce , SDL_FLIP_NONE);
+        SDL_RenderCopyEx(renderer, tex, NULL, &temp , (atan2(mouse->y - (player->center.y + player->rect.y), mouse->x - (player->center.x + player->rect.x)) * 180) / M_PI , &ce , SDL_FLIP_NONE);
     }
 };
 void creat_start_balls(int count_ball, Ball balls[], int path_tatal_lenght, int ball_width ,string game_mode, SDL_Texture *Red_marble, SDL_Texture *Green_marble, SDL_Texture *Blue_marble, SDL_Texture *Yellow_marble, SDL_Texture *Red_marble_ice, SDL_Texture *Green_marble_ice, SDL_Texture *Blue_marble_ice, SDL_Texture *Yellow_marble_ice, SDL_Texture *Black_marble, SDL_Texture *Question_marble , SDL_Texture *Stone_marble , SDL_Texture *Fly_marble)
@@ -275,9 +275,6 @@ void handle_map_balls(int count_ball, Ball balls[], double balls_v, map *ma)
                     balls[i].rightConnnected = true;
                     balls[i + 1].leftConnnected = true;
                     is_connected = true;
-                    //int j = i;
-                    //while (j < count_ball && balls[j].rightConnnected)
-                    //    balls[j++].normal_v = 0;
                 }
                 else
                 {
@@ -542,7 +539,7 @@ bool ball_collision_delete(Ball balls[], int *count_ball, int b, Ball *bullet, b
                 balls[max_left].rightConnnected = false;
             if (max_left >= 0 && max_right < *count_ball)
             {
-                if (balls[max_left].color == balls[max_right].color)
+                if (balls[max_left].color == balls[max_right].color && balls[max_left].color != "Stone" && balls[max_left].color != "Fly" && balls[max_left].color != "Question")
                 {
                     for (int i = max_right; i < *count_ball; i++)
                     {
@@ -566,43 +563,13 @@ bool ball_collision_delete(Ball balls[], int *count_ball, int b, Ball *bullet, b
 }
 void add_ball_collision(Ball balls[], int *count_ball, int b, Ball *bullet, bool is_right, double ball_v, int ball_width)
 {
-    //for(int i = 0 ; i < *count_ball ; i++)
-    //    balls[i].current_loc+=ball_width;
-    // balls[29] = balls[28];
-    // balls[29].current_loc+=500;
     int count = *count_ball;
     Ball temp[count + 1];
     if (is_right)
-    {
         bullet->creat(bullet->tex, bullet->color, balls[b].current_loc + ball_width, ball_width, balls[b].total_path);
-        // if (b + 1 != count) // b not at the end
-        // {
-        //     for (int i = b + 1; i < count; i++)
-        //     {
-        //         if (balls[i].leftConnnected)
-        //             balls[i].current_loc += ball_width;
-        //         else
-        //             break;
-        //     }
-        // }
-    }
     else
-    {
         bullet->creat(bullet->tex, bullet->color, balls[b].current_loc, ball_width, balls[b].total_path);
-        // for (int i = b; i < count; i++)
-        // {
-        //     if (balls[i].rightConnnected)
-        //         balls[i].current_loc += ball_width;
-        //     else
-        //     {
-        //         balls[i].current_loc += ball_width;
-        //         break;
-        //     }
-        // }
-    }
     bullet->is_entering = true;
-    // bullet->Rcenter = bullet->center;
-    // bullet->add_animation_distance = sqrt((bullet->Rcenter.x - bullet->center.x)*(bullet->Rcenter.x - bullet->center.x) + (bullet->Rcenter.y - bullet->center.y)*(bullet->Rcenter.y - bullet->center.y));
     for (int i = 0; i < count + 1; i++)
     {
         if (i < b)
@@ -801,6 +768,7 @@ void collision(Ball balls[], int *count_ball, int b, Ball *bullet, map *ma, doub
         is_right = false;
     else
         is_right = true;
+    music_player.play_chunk("hit");
     if (!ball_collision_delete(balls, count_ball, b, bullet, is_right, ball_v, current_time_mode, time , score , game_mode))
     {
         add_ball_collision(balls, count_ball, b, bullet, is_right, ball_v, ball_width);

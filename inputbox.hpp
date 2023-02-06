@@ -18,9 +18,9 @@ struct Inputbox
         is_selected = false;
         text_color = {R , G , B};
     }
-    bool select(SDL_Point *mouth)
+    bool select(SDL_Point *mouse)
     {
-        if (rect.x <= mouth->x && rect.x + rect.w >= mouth->x && rect.y <= mouth->y && rect.y + rect.h >= mouth->y)
+        if (rect.x <= mouse->x && rect.x + rect.w >= mouse->x && rect.y <= mouse->y && rect.y + rect.h >= mouse->y)
         {
             is_selected = true;
             return true;

@@ -72,3 +72,53 @@ struct map
         }
     }
 };
+void random_map(int *playerX , int *playerY , map *ma)
+{
+    int width = screenWidth - 100;
+    int height = screenHeight;
+    *playerX = rand()%(width - 300) + 150;
+    *playerY = rand()%(height - 300) + 150;
+    do
+    {
+        ma->p1.x = rand()%(width - 100) + 50;
+        ma->p1.y = rand()%(height - 100) + 50;
+    } while (sqrt((*playerY - ma->p1.y) * (*playerY - ma->p1.y) + (*playerX - ma->p1.x) * (*playerX - ma->p1.x)) <= 600 );
+    do
+    {
+        ma->p4.x = rand()%(width - 100) + 50;
+        ma->p4.y = rand()%(height - 100) + 50;
+    } while (sqrt((*playerY - ma->p4.y) * (*playerY - ma->p4.y) + (*playerX - ma->p4.x) * (*playerX - ma->p4.x)) <= 600 || sqrt((ma->p1.y - ma->p4.y) * (ma->p1.y - ma->p4.y) + (ma->p1.x - ma->p4.x) * (ma->p1.x - ma->p4.x)) <= 600 );
+    do
+    {
+        ma->p7.x = rand()%(width - 100) + 50;
+        ma->p7.y = rand()%(height - 100) + 50;
+    } while (sqrt((*playerY - ma->p7.y) * (*playerY - ma->p7.y) + (*playerX - ma->p7.x) * (*playerX - ma->p7.x)) <= 600 || sqrt((ma->p4.y - ma->p7.y) * (ma->p4.y - ma->p7.y) + (ma->p4.x - ma->p7.x) * (ma->p4.x - ma->p7.x)) <= 600 );
+    do
+    {
+        ma->p10.x = rand()%(width - 100) + 50;
+        ma->p10.y = rand()%(height - 100) + 50;
+    } while (sqrt((*playerY - ma->p10.y) * (*playerY - ma->p10.y) + (*playerX - ma->p10.x) * (*playerX - ma->p10.x)) <= 600 || sqrt((ma->p7.y - ma->p10.y) * (ma->p7.y - ma->p10.y) + (ma->p7.x - ma->p10.x) * (ma->p7.x - ma->p10.x)) <= 600 );
+    ma->p2.x = rand()%(width - 100) + 50;
+    ma->p2.y = rand()%(height - 100) + 50;
+    ma->p3.x = rand()%(width - 100) + 50;
+    ma->p3.y = rand()%(height - 100) + 50;
+    
+    double m = -1 * (double)(ma->p3.y - ma->p4.y)/ (double)(ma->p3.x - ma->p4.x);
+    int max_x = 200 / sqrt(m*m + 1);
+    int x = rand() % max_x;
+
+    ma->p5.x = ma->p4.x - x ;
+    ma->p5.y = ma->p4.y - x*m;
+
+    ma->p6.x = rand()%(width - 100) + 50;
+    ma->p6.y = rand()%(height - 100) + 50;
+
+    m = -1 * (double)(ma->p6.y - ma->p7.y)/ (double)(ma->p6.x - ma->p7.x);
+    max_x = 200 / sqrt(m*m + 1);
+    x = rand() % max_x;
+    ma->p8.x = ma->p7.x - x;
+    ma->p8.y = ma->p7.y - x*m;
+
+    ma->p9.x = rand()%(width - 100) + 50;
+    ma->p9.y = rand()%(height - 100) + 50;
+}

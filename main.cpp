@@ -106,6 +106,7 @@ void make_leaderboard(User users[] , int count_user , User leaderboard_user[])
 }
 int main(int argv, char **args)
 {
+    //Inits
     srand(time(NULL));
     if (SDL_Init(SDL_INIT_EVERYTHING) > 0)
         std::cout << "SDL Init fail .error : " << SDL_GetError() << std::endl;
@@ -119,6 +120,7 @@ int main(int argv, char **args)
     SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     if (renderer == NULL)
         std::cout << "SDL fail to create renderer . error : " << SDL_GetError() << std::endl;
+    Mix_Init(MIX_INIT_MP3);
     if( Mix_OpenAudio( 44100, MIX_DEFAULT_FORMAT, 2, 2048 ) < 0 )
         cout<<"SDL_mixer could not initialize! SDL_mixer Error: "<< Mix_GetError()<<endl;
 
@@ -137,10 +139,67 @@ int main(int argv, char **args)
     SDL_Texture *Fly_marble = IMG_LoadTexture(renderer, "assest/fly_marble.png");
     SDL_Texture *Fly_gone_marble = IMG_LoadTexture(renderer, "assest/fly_marble.png");
     SDL_Texture *stone_background = IMG_LoadTexture(renderer, "assest/stone_background.jpg");
+    SDL_Texture *space_background = IMG_LoadTexture(renderer, "assest/space_background.jpg");
+    SDL_Texture *space_background2 = IMG_LoadTexture(renderer, "assest/space_background2.jpg");
+    SDL_Texture *space_background3 = IMG_LoadTexture(renderer, "assest/space_background3.jpg");
+    SDL_Texture *frist_page_background = IMG_LoadTexture(renderer, "assest/frist_page_background.jpg");
     SDL_Texture *Cannon = IMG_LoadTexture(renderer, "assest/cannon.png");
     SDL_Texture *PathTex = IMG_LoadTexture(renderer, "assest/path2.png");
-    SDL_Texture *Bomb_power_button_norm = IMG_LoadTexture(renderer, "assest/change_norm.png");
-    SDL_Texture *Bomb_power_button_selected = IMG_LoadTexture(renderer, "assest/change_selected.png");
+    SDL_Texture *Quit_button_norm = IMG_LoadTexture(renderer, "assest/quit_btn-1.png");
+    SDL_Texture *Quit_button_selected = IMG_LoadTexture(renderer, "assest/quit_selected_btn.png");
+    SDL_Texture *Login_button_norm = IMG_LoadTexture(renderer, "assest/login_btn-1.png");
+    SDL_Texture *Login_button_selected = IMG_LoadTexture(renderer, "assest/login_btn_selected.png");
+    SDL_Texture *Register_button_norm = IMG_LoadTexture(renderer, "assest/register_btn-1.png");
+    SDL_Texture *Register_button_selected = IMG_LoadTexture(renderer, "assest/register_btn_selected.png");
+    SDL_Texture *Leaderboard_button_norm = IMG_LoadTexture(renderer, "assest/leaderboard_btn-1.png");
+    SDL_Texture *Leaderboard_button_selected = IMG_LoadTexture(renderer, "assest/leaderboard_selected_btn.png");
+    SDL_Texture *Tryagain_button_norm = IMG_LoadTexture(renderer, "assest/tryagain_btn-1.png");
+    SDL_Texture *Tryagain_button_selected = IMG_LoadTexture(renderer, "assest/tryagain_btn_selected.png");
+    SDL_Texture *Choose_mode_button_norm = IMG_LoadTexture(renderer, "assest/choose_mode_btn-1.png");
+    SDL_Texture *Choose_mode_button_selected = IMG_LoadTexture(renderer, "assest/choose_mode_btn_selected.png");
+    SDL_Texture *Done_button_norm = IMG_LoadTexture(renderer, "assest/done_btn-1.png");
+    SDL_Texture *Done_button_selected = IMG_LoadTexture(renderer, "assest/done_btn_selected.png");
+    SDL_Texture *Setting_button_norm = IMG_LoadTexture(renderer, "assest/setting_btn-1.png");
+    SDL_Texture *Setting_button_selected = IMG_LoadTexture(renderer, "assest/setting_selected_btn.png");
+    SDL_Texture *Start_button_norm = IMG_LoadTexture(renderer, "assest/start_game_btn-1.png");
+    SDL_Texture *Start_button_selected = IMG_LoadTexture(renderer, "assest/start_game_selected_btn.png");
+    SDL_Texture *Logout_button_norm = IMG_LoadTexture(renderer, "assest/logout_btn-1.png");
+    SDL_Texture *Logout_button_selected = IMG_LoadTexture(renderer, "assest/logout_selected_btn.png");
+    SDL_Texture *Normal_mode_button_norm = IMG_LoadTexture(renderer, "assest/normal.png");
+    SDL_Texture *Normal_mode_button_selected = IMG_LoadTexture(renderer, "assest/normal.png");
+    SDL_Texture *Timer_mode_button_norm = IMG_LoadTexture(renderer, "assest/timer.png");
+    SDL_Texture *Timer_mode_button_selected = IMG_LoadTexture(renderer, "assest/timer.png");
+    SDL_Texture *Stone_mode_button_norm = IMG_LoadTexture(renderer, "assest/stone_marble.png");
+    SDL_Texture *Stone_mode_button_selected = IMG_LoadTexture(renderer, "assest/stone_marble.png");
+    SDL_Texture *Fly_mode_button_norm = IMG_LoadTexture(renderer, "assest/fly_marble.png");
+    SDL_Texture *Fly_mode_button_selected = IMG_LoadTexture(renderer, "assest/fly_marble.png");
+    SDL_Texture *Inputbox_norm = IMG_LoadTexture(renderer, "assest/input_box_norm.png");
+    SDL_Texture *Inputbox_selected = IMG_LoadTexture(renderer, "assest/input_box_selected.png");
+    SDL_Texture *Music_change_button_norm = IMG_LoadTexture(renderer, "assest/change_music_btn-1.png");
+    SDL_Texture *Music_change_button_selected = IMG_LoadTexture(renderer, "assest/change_music_btn_selected.png");
+    SDL_Texture *Musicoff_button_norm = IMG_LoadTexture(renderer, "assest/music_btn-1.png");
+    SDL_Texture *Musicoff_button_selected = IMG_LoadTexture(renderer, "assest/music_btn_selected.png");
+    SDL_Texture *Soundoff_button_norm = IMG_LoadTexture(renderer, "assest/sound_btn-1.png");
+    SDL_Texture *Soundoff_button_selected = IMG_LoadTexture(renderer, "assest/sound_btn_selected.png");
+    SDL_Texture *Help_button_norm = IMG_LoadTexture(renderer, "assest/help_btn-1.png");
+    SDL_Texture *Help_button_selected = IMG_LoadTexture(renderer, "assest/help_btn_selected.png");
+    SDL_Texture *Resume_button_norm = IMG_LoadTexture(renderer, "assest/resume_btn-1.png");
+    SDL_Texture *Resume_button_selected = IMG_LoadTexture(renderer, "assest/resume_btn_selected.png");
+    SDL_Texture *Mainmenu_button_norm = IMG_LoadTexture(renderer, "assest/main_btn-1.png");
+    SDL_Texture *Mainmenu_button_selected = IMG_LoadTexture(renderer, "assest/main_btn_selected.png");
+    SDL_Texture *First_map_button = IMG_LoadTexture(renderer, "assest/First_map.png");
+    SDL_Texture *Second_map_button = IMG_LoadTexture(renderer, "assest/Second_map.png");
+    SDL_Texture *Third_map_button = IMG_LoadTexture(renderer, "assest/Third_map.png");
+    SDL_Texture *Random_map_button = IMG_LoadTexture(renderer, "assest/Random_map.jpg");
+    SDL_Texture *Bomb = IMG_LoadTexture(renderer, "assest/bomb.png");
+    SDL_Texture *Rainbow = IMG_LoadTexture(renderer, "assest/rainbow_marble.png");
+    SDL_Texture *Fireball = IMG_LoadTexture(renderer, "assest/fireball_marble.png");
+    SDL_Texture *Slowmo_power = IMG_LoadTexture(renderer, "assest/slowmo_power.png");
+    SDL_Texture *Stop_power = IMG_LoadTexture(renderer, "assest/pause_power.png");
+    SDL_Texture *Reverse_power = IMG_LoadTexture(renderer, "assest/reverse_power.png");
+    SDL_Texture *Missle_tex = IMG_LoadTexture(renderer, "assest/missile.png");
+    SDL_Texture *Bomb_power_button_norm = IMG_LoadTexture(renderer, "assest/bomb.png");
+    SDL_Texture *Bomb_power_button_selected = IMG_LoadTexture(renderer, "assest/bomb.png");
     SDL_Texture *Rainbow_power_button_norm = IMG_LoadTexture(renderer, "assest/change_norm.png");
     SDL_Texture *Rainbow_power_button_selected = IMG_LoadTexture(renderer, "assest/change_selected.png");
     SDL_Texture *Fireball_power_button_norm = IMG_LoadTexture(renderer, "assest/change_norm.png");
@@ -149,74 +208,28 @@ int main(int argv, char **args)
     SDL_Texture *Lightning_power_button_selected = IMG_LoadTexture(renderer, "assest/change_selected.png");
     SDL_Texture *Missile_power_button_norm = IMG_LoadTexture(renderer, "assest/change_norm.png");
     SDL_Texture *Missile_power_button_selected = IMG_LoadTexture(renderer, "assest/change_selected.png");
-    SDL_Texture *Quit_button_norm = IMG_LoadTexture(renderer, "assest/change_norm.png");
-    SDL_Texture *Quit_button_selected = IMG_LoadTexture(renderer, "assest/change_selected.png");
-    SDL_Texture *Login_button_norm = IMG_LoadTexture(renderer, "assest/change_norm.png");
-    SDL_Texture *Login_button_selected = IMG_LoadTexture(renderer, "assest/change_selected.png");
-    SDL_Texture *Register_button_norm = IMG_LoadTexture(renderer, "assest/change_norm.png");
-    SDL_Texture *Register_button_selected = IMG_LoadTexture(renderer, "assest/change_selected.png");
-    SDL_Texture *Leaderboard_button_norm = IMG_LoadTexture(renderer, "assest/change_norm.png");
-    SDL_Texture *Leaderboard_button_selected = IMG_LoadTexture(renderer, "assest/change_selected.png");
-    SDL_Texture *Tryagain_button_norm = IMG_LoadTexture(renderer, "assest/change_norm.png");
-    SDL_Texture *Tryagain_button_selected = IMG_LoadTexture(renderer, "assest/change_selected.png");
-    SDL_Texture *Choose_mode_button_norm = IMG_LoadTexture(renderer, "assest/change_norm.png");
-    SDL_Texture *Choose_mode_button_selected = IMG_LoadTexture(renderer, "assest/change_selected.png");
-    SDL_Texture *Done_button_norm = IMG_LoadTexture(renderer, "assest/change_norm.png");
-    SDL_Texture *Done_button_selected = IMG_LoadTexture(renderer, "assest/change_selected.png");
-    SDL_Texture *Setting_button_norm = IMG_LoadTexture(renderer, "assest/change_norm.png");
-    SDL_Texture *Setting_button_selected = IMG_LoadTexture(renderer, "assest/change_selected.png");
-    SDL_Texture *Start_button_norm = IMG_LoadTexture(renderer, "assest/change_norm.png");
-    SDL_Texture *Start_button_selected = IMG_LoadTexture(renderer, "assest/change_selected.png");
-    SDL_Texture *Logout_button_norm = IMG_LoadTexture(renderer, "assest/change_norm.png");
-    SDL_Texture *Logout_button_selected = IMG_LoadTexture(renderer, "assest/change_selected.png");
-    SDL_Texture *Normal_mode_button_norm = IMG_LoadTexture(renderer, "assest/change_norm.png");
-    SDL_Texture *Normal_mode_button_selected = IMG_LoadTexture(renderer, "assest/change_selected.png");
-    SDL_Texture *Timer_mode_button_norm = IMG_LoadTexture(renderer, "assest/change_norm.png");
-    SDL_Texture *Timer_mode_button_selected = IMG_LoadTexture(renderer, "assest/change_selected.png");
-    SDL_Texture *Stone_mode_button_norm = IMG_LoadTexture(renderer, "assest/change_norm.png");
-    SDL_Texture *Stone_mode_button_selected = IMG_LoadTexture(renderer, "assest/change_selected.png");
-    SDL_Texture *Fly_mode_button_norm = IMG_LoadTexture(renderer, "assest/change_norm.png");
-    SDL_Texture *Fly_mode_button_selected = IMG_LoadTexture(renderer, "assest/change_selected.png");
-    SDL_Texture *Inputbox_norm = IMG_LoadTexture(renderer, "assest/input_box_norm.png");
-    SDL_Texture *Inputbox_selected = IMG_LoadTexture(renderer, "assest/input_box_selected.png");
-    SDL_Texture *Music_change_button_norm = IMG_LoadTexture(renderer, "assest/change_norm.png");
-    SDL_Texture *Music_change_button_selected = IMG_LoadTexture(renderer, "assest/change_selected.png");
-    SDL_Texture *Musicoff_button_norm = IMG_LoadTexture(renderer, "assest/change_norm.png");
-    SDL_Texture *Musicoff_button_selected = IMG_LoadTexture(renderer, "assest/change_selected.png");
-    SDL_Texture *Soundoff_button_norm = IMG_LoadTexture(renderer, "assest/change_norm.png");
-    SDL_Texture *Soundoff_button_selected = IMG_LoadTexture(renderer, "assest/change_selected.png");
-    SDL_Texture *Help_button_norm = IMG_LoadTexture(renderer, "assest/change_norm.png");
-    SDL_Texture *Help_button_selected = IMG_LoadTexture(renderer, "assest/change_selected.png");
-    SDL_Texture *Resume_button_norm = IMG_LoadTexture(renderer, "assest/change_norm.png");
-    SDL_Texture *Resume_button_selected = IMG_LoadTexture(renderer, "assest/change_selected.png");
-    SDL_Texture *Mainmenu_button_norm = IMG_LoadTexture(renderer, "assest/change_norm.png");
-    SDL_Texture *Mainmenu_button_selected = IMG_LoadTexture(renderer, "assest/change_selected.png");
-    SDL_Texture *Bomb = IMG_LoadTexture(renderer, "assest/bomb.png");
-    SDL_Texture *Rainbow = IMG_LoadTexture(renderer, "assest/bomb.png");
-    SDL_Texture *Fireball = IMG_LoadTexture(renderer, "assest/bomb.png");
-    SDL_Texture *Slowmo_power = IMG_LoadTexture(renderer, "assest/slowmo_power.png");
-    SDL_Texture *Stop_power = IMG_LoadTexture(renderer, "assest/pause_power.png");
-    SDL_Texture *Reverse_power = IMG_LoadTexture(renderer, "assest/reverse_power.png");
-    SDL_Texture *Missle_tex = IMG_LoadTexture(renderer, "assest/missile.png");
 
     TTF_Font *arial_font = TTF_OpenFont("assest/arial.ttf", 24);
     TTF_Font *arial_font2 = TTF_OpenFont("assest/arial.ttf", 32);
 
-    Mix_Music *Music1 = Mix_LoadMUS("assest/The_Fathiers.wav");
-    Mix_Music *Music2 = Mix_LoadMUS("assest/Fun_With_Finn_and_Rose.wav");
-    Mix_Music *Music3 = Mix_LoadMUS("assest/Canto_Bight.wav");
+    Mix_Music *Music2 = Mix_LoadMUS("assest/The_Fathiers.mp3");
+    Mix_Music *Music3 = Mix_LoadMUS("assest/Fun_With_Finn_and_Rose.mp3");
+    Mix_Music *Music1 = Mix_LoadMUS("assest/Canto_Bight.mp3");
     music_player.Mclick = Mix_LoadWAV( "assest/click.wav");
+    music_player.Mexplotion = Mix_LoadWAV( "assest/explotion.wav");
+    music_player.Mfire = Mix_LoadWAV( "assest/fire.wav");
+    music_player.Mhit = Mix_LoadWAV( "assest/hit.wav");
     if( Music1 == NULL )
     {
         printf( "Failed to load beat music! SDL_mixer Error: %s\n", Mix_GetError() );
     }
-
+    
+    //empty texture for map 
     SDL_Texture *BackGround = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_UNKNOWN, SDL_TEXTUREACCESS_TARGET, screenWidth, screenHeight);
-    //SDL_SetRenderDrawColor( renderer, 0, 0,255, 0 );
-    //SDL_RenderClear( renderer );
 
     string mode = "start_menu";
     string game_mode = "stone";
+    int current_map = 1;
     SDL_Rect fullScreen = {0, 0, screenWidth, screenHeight};
 
     int current_music = 0;
@@ -224,13 +237,13 @@ int main(int argv, char **args)
     SDL_Event event;
     Uint32 frameStart;
     int frameTime;
-    SDL_Point mouth;
-    bool mouthL = false;
+    SDL_Point mouse;
+    bool mouseL = false;
     Timer game_timer;
     int score, point, prize;
     int max_timer_mode_lenght = 180;
-    //string username = "mohammad";
 
+    //button create
     Button Quit;
     Quit.create(Quit_button_norm, Quit_button_selected, screenWidth - 100, screenHeight / 2 - 100, 120, 80, 300);
     Button Tryagain;
@@ -254,7 +267,7 @@ int main(int argv, char **args)
     Button Normal_mode;
     Normal_mode.create(Normal_mode_button_norm, Normal_mode_button_selected, 10, screenHeight / 2 - 150, 300, 300, 300);
     Button Timer_mode;
-    Timer_mode.create(Timer_mode_button_norm, Timer_mode_button_selected, 330, screenHeight / 2 - 150, 300, 300, 300);
+    Timer_mode.create(Timer_mode_button_norm, Timer_mode_button_selected, 330, screenHeight / 2 - 190, 300, 380, 300);
     Button Stone_mode;
     Stone_mode.create(Stone_mode_button_norm, Stone_mode_button_selected, 650, screenHeight / 2 - 150, 300, 300, 300);
     Button Fly_mode;
@@ -267,6 +280,15 @@ int main(int argv, char **args)
     Help.create(Help_button_norm, Help_button_selected, screenWidth/2 - 100 , 350, 200, 100, 300);
     Button Mainmenu;
     Mainmenu.create(Mainmenu_button_norm, Mainmenu_button_selected, screenWidth/2 - 100 , 350, 200, 100, 300);
+
+    Button First_map;
+    First_map.create(First_map_button, First_map_button, 40 , 25 , 560, 370, 300);
+    Button Second_map;
+    Second_map.create(Second_map_button, Second_map_button, 650 , 25 , 560, 370, 300);
+    Button Third_map;
+    Third_map.create(Third_map_button, Third_map_button, 40 , screenHeight/2 + 25 , 560, 370, 300);
+    Button Random_map;
+    Random_map.create(Random_map_button, Random_map_button, 650 , screenHeight/2 + 25 , 560, 370, 300);
 
     Keyboard_handler input_keyboard;
     input_keyboard.delay = 3;
@@ -315,15 +337,15 @@ int main(int argv, char **args)
                 is_gameRunning = false;
                 break;
             case SDL_MOUSEMOTION:
-                SDL_GetMouseState(&mouth.x, &mouth.y);
+                SDL_GetMouseState(&mouse.x, &mouse.y);
                 break;
             case SDL_MOUSEBUTTONDOWN:
                 if (event.button.button == SDL_BUTTON_LEFT)
-                    mouthL = true;
+                    mouseL = true;
                 break;
             case SDL_MOUSEBUTTONUP:
                 if (event.button.button == SDL_BUTTON_LEFT)
-                    mouthL = false;
+                    mouseL = false;
                 break;
             case SDL_KEYDOWN:
                 if (event.key.keysym.sym == SDLK_q)
@@ -331,6 +353,20 @@ int main(int argv, char **args)
                 if (mode == "login" || mode == "register")
                 {
                     input_keyboard.keydown(&event);
+                    if(event.key.keysym.sym == SDLK_TAB)
+                    {
+                        if(username_input.is_selected)
+                        {
+                            password_input.is_selected = true;
+                            username_input.is_selected = false;
+                        }
+                        else
+                        {
+                            username_input.is_selected = true;
+                            password_input.is_selected = false;
+                        }
+                        input_keyboard.curruntK = '!';
+                    }
                 }
                 break;
             case SDL_KEYUP:
@@ -346,42 +382,46 @@ int main(int argv, char **args)
 
         if (mode == "start_menu")
         {
-            SDL_RenderCopy(renderer, stone_background, NULL, NULL);
+            SDL_RenderCopy(renderer, frist_page_background, NULL, NULL);
 
             Login.rect.w = 250;
-            Login.rect.h = 120;
-            Login.rect.x = screenWidth/2 - Login.rect.w /2;
-            Login.rect.y = 100;
+            Login.rect.h = 58;
+            Login.rect.x = 120;
+            Login.rect.y = 35;
 
             Register.rect.w = 250;
-            Register.rect.h = 120;
-            Register.rect.x = screenWidth/2 - Register.rect.w /2;
-            Register.rect.y = 300;
+            Register.rect.h = 58;
+            Register.rect.x = 120;
+            Register.rect.y = 113;
 
             Quit.rect.w = 250;
-            Quit.rect.h = 120;
-            Quit.rect.x = screenWidth/2 - Quit.rect.w /2;
-            Quit.rect.y = 500;
+            Quit.rect.h = 58;
+            Quit.rect.x = 120;
+            Quit.rect.y = 191;
 
-            Login.Draw(renderer, &mouth);
-            Register.Draw(renderer, &mouth);
-            Quit.Draw(renderer, &mouth);
+            Login.Draw(renderer, &mouse);
+            Register.Draw(renderer, &mouse);
+            Quit.Draw(renderer, &mouse);
 
-            if (mouthL)
+            if (mouseL)
             {
-                if (Login.is_clicked(&mouth))
+                if (Login.is_clicked(&mouse))
                 {
                     mode = "login";
                     username_input.text = "";
                     password_input.text = "";
+                    username_input.is_selected = true;
+                    password_input.is_selected = false;
                 }
-                if (Register.is_clicked(&mouth))
+                if (Register.is_clicked(&mouse))
                 {
                     mode = "register";
                     username_input.text = "";
                     password_input.text = "";
+                    username_input.is_selected = true;
+                    password_input.is_selected = false;
                 }
-                if (Quit.is_clicked(&mouth))
+                if (Quit.is_clicked(&mouse))
                 {
                     is_gameRunning = false;
                 }
@@ -389,23 +429,23 @@ int main(int argv, char **args)
         }
         else if (mode == "login")
         {
-            SDL_RenderCopy(renderer, stone_background, NULL, NULL);
+            SDL_RenderCopy(renderer, space_background3, NULL, NULL);
             
-            SDL_Color text_color = {0, 0, 0};
+            SDL_Color text_color = {255, 255, 255};
 
-            Register.rect.w = 150;
-            Register.rect.h = 90;
-            Register.rect.x = 360;
+            Register.rect.w = 250;
+            Register.rect.h = 58;
+            Register.rect.x = 210;
             Register.rect.y = 500;
 
-            Done.rect.w = 150;
-            Done.rect.h = 90;
-            Done.rect.x = 560;
+            Done.rect.w = 250;
+            Done.rect.h = 58;
+            Done.rect.x = 510;
             Done.rect.y = 500;
 
-            Quit.rect.w = 150;
-            Quit.rect.h = 90;
-            Quit.rect.x = 760;
+            Quit.rect.w = 250;
+            Quit.rect.h = 58;
+            Quit.rect.x = 810;
             Quit.rect.y = 500;
 
             draw_text(renderer , "Login" , arial_font2 , screenWidth/2 - 100 , 50, text_color.r , text_color.g , text_color.b , 2 , 2);
@@ -414,24 +454,26 @@ int main(int argv, char **args)
 
             draw_text(renderer , "Password :", arial_font2 , 100 , password_input.text_rect.y, text_color.r , text_color.g , text_color.b);
 
-            Register.Draw(renderer, &mouth);
-            Done.Draw(renderer, &mouth);
-            Quit.Draw(renderer, &mouth);
+            Register.Draw(renderer, &mouse);
+            Done.Draw(renderer, &mouse);
+            Quit.Draw(renderer, &mouse);
 
-            if (mouthL)
+            if (mouseL)
             {
-                if(username_input.select(&mouth))
+                if(username_input.select(&mouse))
                     password_input.is_selected = false;
-                if(password_input.select(&mouth))
+                if(password_input.select(&mouse))
                     username_input.is_selected = false;
-                if (Register.is_clicked(&mouth))
+                if (Register.is_clicked(&mouse))
                 {
                     mode = "register";
                     username_input.text = "";
                     password_input.text = "";
+                    username_input.is_selected = true;
+                    password_input.is_selected = false;
                     SDL_Delay(200);
                 }
-                if(Done.is_clicked(&mouth))
+                if(Done.is_clicked(&mouse))
                 {
                     int c = is_user_exist(users , count_user , username_input.text);
                     if(c != -1)
@@ -448,7 +490,7 @@ int main(int argv, char **args)
                     else
                         cout<<"User Dosent Exist"<<endl;
                 }
-                if (Quit.is_clicked(&mouth))
+                if (Quit.is_clicked(&mouse))
                 {
                     is_gameRunning = false;
                 }
@@ -460,23 +502,23 @@ int main(int argv, char **args)
         }
         else if (mode == "register")
         {
-            SDL_RenderCopy(renderer, stone_background, NULL, NULL);
+            SDL_RenderCopy(renderer, space_background3, NULL, NULL);
 
-            SDL_Color text_color = {0, 0, 0};
+            SDL_Color text_color = {255, 255, 255};
 
-            Login.rect.w = 150;
-            Login.rect.h = 90;
-            Login.rect.x = 360;
+            Login.rect.w = 250;
+            Login.rect.h = 58;
+            Login.rect.x = 210;
             Login.rect.y = 500;
 
-            Done.rect.w = 150;
-            Done.rect.h = 90;
-            Done.rect.x = 560;
+            Done.rect.w = 250;
+            Done.rect.h = 58;
+            Done.rect.x = 510;
             Done.rect.y = 500;
 
-            Quit.rect.w = 150;
-            Quit.rect.h = 90;
-            Quit.rect.x = 760;
+            Quit.rect.w = 250;
+            Quit.rect.h = 58;
+            Quit.rect.x = 810;
             Quit.rect.y = 500;
 
             draw_text(renderer , "Register" , arial_font2 , screenWidth/2 - 100 , 50, text_color.r , text_color.g , text_color.b , 2 , 2);
@@ -485,24 +527,26 @@ int main(int argv, char **args)
 
             draw_text(renderer , "Password :", arial_font2 , 100 , password_input.text_rect.y, text_color.r , text_color.g , text_color.b);
 
-            Login.Draw(renderer, &mouth);
-            Done.Draw(renderer, &mouth);
-            Quit.Draw(renderer, &mouth);
+            Login.Draw(renderer, &mouse);
+            Done.Draw(renderer, &mouse);
+            Quit.Draw(renderer, &mouse);
 
-            if (mouthL)
+            if (mouseL)
             {
-                if(username_input.select(&mouth))
+                if(username_input.select(&mouse))
                     password_input.is_selected = false;
-                if(password_input.select(&mouth))
+                if(password_input.select(&mouse))
                     username_input.is_selected = false;
-                if (Login.is_clicked(&mouth))
+                if (Login.is_clicked(&mouse))
                 {
                     mode = "login";
                     username_input.text = "";
                     password_input.text = "";
+                    username_input.is_selected = true;
+                    password_input.is_selected = false;
                     SDL_Delay(200);
                 }
-                if(Done.is_clicked(&mouth))
+                if(Done.is_clicked(&mouse))
                 {
                     if(is_user_exist(users , count_user , username_input.text) == -1)
                     {
@@ -526,7 +570,7 @@ int main(int argv, char **args)
                     else
                         cout<<"User Already Exist"<<endl;
                 }
-                if (Quit.is_clicked(&mouth))
+                if (Quit.is_clicked(&mouse))
                 {
                     is_gameRunning = false;
                 }
@@ -538,68 +582,68 @@ int main(int argv, char **args)
         }
         else if (mode == "main_menu")
         {
-            SDL_RenderCopy(renderer, stone_background, NULL, NULL);
+            SDL_RenderCopy(renderer, frist_page_background, NULL, NULL);
 
             SDL_Color text_color = {0, 0, 0};
 
             Start.rect.w = 250;
-            Start.rect.h = 120;
-            Start.rect.x = screenWidth/2 - Start.rect.w /2;
-            Start.rect.y = 50;
+            Start.rect.h = 58;
+            Start.rect.x = 120;
+            Start.rect.y = 35;
 
             Leaderboard.rect.w = 250;
-            Leaderboard.rect.h = 120;
-            Leaderboard.rect.x = screenWidth/2 - Leaderboard.rect.w /2;
-            Leaderboard.rect.y = 200;
+            Leaderboard.rect.h = 58;
+            Leaderboard.rect.x = 120;
+            Leaderboard.rect.y = 113;
 
             Setting.rect.w = 250;
-            Setting.rect.h = 120;
-            Setting.rect.x = screenWidth/2 - Setting.rect.w /2;
-            Setting.rect.y = 350;
+            Setting.rect.h = 58;
+            Setting.rect.x = 120;
+            Setting.rect.y = 191;
 
             Logout.rect.w = 250;
-            Logout.rect.h = 120;
-            Logout.rect.x = screenWidth/2 - Logout.rect.w /2;
-            Logout.rect.y = 500;
+            Logout.rect.h = 58;
+            Logout.rect.x = 120;
+            Logout.rect.y = 269;
 
             Quit.rect.w = 250;
-            Quit.rect.h = 120;
-            Quit.rect.x = screenWidth/2 - Quit.rect.w /2;
-            Quit.rect.y = 650;
+            Quit.rect.h = 58;
+            Quit.rect.x = 120;
+            Quit.rect.y = 347;
 
-            draw_text(renderer , "Welcome "+users[current_user].username , arial_font2 , 50 , 50, text_color.r , text_color.g , text_color.b);
+            draw_text(renderer , "Welcome "+users[current_user].username , arial_font2 , screenWidth/2 - 100 , 30, text_color.r , text_color.g , text_color.b);
 
-            Start.Draw(renderer, &mouth);
-            Leaderboard.Draw(renderer, &mouth);
-            Logout.Draw(renderer , &mouth);
-            Setting.Draw(renderer, &mouth);
-            Quit.Draw(renderer, &mouth);
+            Start.Draw(renderer, &mouse);
+            Leaderboard.Draw(renderer, &mouse);
+            Logout.Draw(renderer , &mouse);
+            Setting.Draw(renderer, &mouse);
+            Quit.Draw(renderer, &mouse);
 
-            if (mouthL)
+            if (mouseL)
             {
-                if (Start.is_clicked(&mouth))
+                if (Start.is_clicked(&mouse))
                 {
                     mode = "choose_mode";
                     SDL_Delay(200);
                 }
-                if (Logout.is_clicked(&mouth))
+                if (Logout.is_clicked(&mouse))
                 {
                     mode = "start_menu";
                     current_user = -1;
                     SDL_Delay(200);
                 }
-                if (Leaderboard.is_clicked(&mouth))
+                if (Leaderboard.is_clicked(&mouse))
                 {
                     mode = "leaderboard";
                     make_leaderboard(users , count_user , leaderboard_user);
                     SDL_Delay(200);
                 }
-                if (Setting.is_clicked(&mouth))
+                if (Setting.is_clicked(&mouse))
                 {
                     mode = "setting";
                     SDL_Delay(200);
                 }
-                if (Quit.is_clicked(&mouth))
+                if (Quit.is_clicked(&mouse))
                 {
                     is_gameRunning = false;
                 }
@@ -607,31 +651,31 @@ int main(int argv, char **args)
         }
         else if (mode == "setting")
         {
-            SDL_RenderCopy(renderer, stone_background, NULL, NULL);
+            SDL_RenderCopy(renderer, frist_page_background, NULL, NULL);
             Help.rect.w = 250;
-            Help.rect.h = 120;
-            Help.rect.x = screenWidth/2 - Help.rect.w /2;
-            Help.rect.y = 100;
+            Help.rect.h = 58;
+            Help.rect.x = 120;
+            Help.rect.y = 35;
 
             Musicoff.rect.w = 250;
-            Musicoff.rect.h = 120;
-            Musicoff.rect.x = screenWidth/2 - Musicoff.rect.w /2;
-            Musicoff.rect.y = 250;
+            Musicoff.rect.h = 58;
+            Musicoff.rect.x = 120;
+            Musicoff.rect.y = 113;
 
             Soundoff.rect.w = 250;
-            Soundoff.rect.h = 120;
-            Soundoff.rect.x = screenWidth/2 - Soundoff.rect.w /2;
-            Soundoff.rect.y = 400;
+            Soundoff.rect.h = 58;
+            Soundoff.rect.x = 120;
+            Soundoff.rect.y = 191;
 
             Mainmenu.rect.w = 250;
-            Mainmenu.rect.h = 120;
-            Mainmenu.rect.x = screenWidth/2 - Mainmenu.rect.w /2;
-            Mainmenu.rect.y = 550;
+            Mainmenu.rect.h = 58;
+            Mainmenu.rect.x = 120;
+            Mainmenu.rect.y = 269;
 
-            Help.Draw(renderer, &mouth);
-            Musicoff.Draw(renderer, &mouth);
-            Soundoff.Draw(renderer, &mouth);
-            Mainmenu.Draw(renderer, &mouth);
+            Help.Draw(renderer, &mouse);
+            Musicoff.Draw(renderer, &mouse);
+            Soundoff.Draw(renderer, &mouse);
+            Mainmenu.Draw(renderer, &mouse);
 
             string music_status,sound_status;
             if(music_player.is_effect_on)
@@ -642,16 +686,16 @@ int main(int argv, char **args)
                 music_status = "ON";
             else
                 music_status = "OFF";
-            draw_text(renderer , sound_status, arial_font2 , 800 , Soundoff.rect.y +Soundoff.rect.h/2 -15 , 0 , 0 , 0);
-            draw_text(renderer , music_status, arial_font2 , 800 , Musicoff.rect.y +Musicoff.rect.h/2 -15 , 0 , 0 , 0);
-            if (mouthL)
+            draw_text(renderer , sound_status, arial_font2 , 400 , Soundoff.rect.y +Soundoff.rect.h/2 -15 , 255 , 255 , 255);
+            draw_text(renderer , music_status, arial_font2 , 400 , Musicoff.rect.y +Musicoff.rect.h/2 -15 , 255 , 255 , 255);
+            if (mouseL)
             {
-                if (Mainmenu.is_clicked(&mouth))
+                if (Mainmenu.is_clicked(&mouse))
                 {
                     mode = "main_menu";
                     SDL_Delay(200);
                 }
-                if (Musicoff.is_clicked(&mouth))
+                if (Musicoff.is_clicked(&mouse))
                 {
                     if(music_on)
                     {
@@ -661,14 +705,14 @@ int main(int argv, char **args)
                     else
                         music_on = true;
                 }
-                if (Soundoff.is_clicked(&mouth))
+                if (Soundoff.is_clicked(&mouse))
                 {
                     if(music_player.is_effect_on)
                         music_player.is_effect_on = false;
                     else
                         music_player.is_effect_on = true;
                 }
-                if (Help.is_clicked(&mouth))
+                if (Help.is_clicked(&mouse))
                 {
                     mode = "help";
                     SDL_Delay(200);
@@ -677,17 +721,17 @@ int main(int argv, char **args)
         }
         else if (mode == "help")
         {
-            SDL_RenderCopy(renderer, stone_background, NULL, NULL);
+            SDL_RenderCopy(renderer, frist_page_background, NULL, NULL);
             Mainmenu.rect.w = 250;
-            Mainmenu.rect.h = 120;
+            Mainmenu.rect.h = 58;
             Mainmenu.rect.x = 100;
-            Mainmenu.rect.y = 550;
-            Mainmenu.Draw(renderer, &mouth);
-            draw_text(renderer , "Every thing is completely obvious", arial_font2 , 50 , 50 , 0 , 0 , 0 , 1.5 , 1.5);
-            draw_text(renderer , "This game is created by Mohammad bagher khandan (MBKH)", arial_font2 , 50 , 150 , 0 , 0 , 0 , 1.5 , 1.5);
-            if (mouthL)
+            Mainmenu.rect.y = 350;
+            Mainmenu.Draw(renderer, &mouse);
+            draw_text(renderer , "Every thing is completely obvious", arial_font2 , 50 , 50 , 255 , 255 , 255 , 1.5 , 1.5);
+            draw_text(renderer , "This game is created by Mohammad bagher khandan (MBKH) and Davood", arial_font2 , 50 , 150 , 255 , 255 , 255 , 1.5 , 1.5);
+            if (mouseL)
             {
-                if (Mainmenu.is_clicked(&mouth))
+                if (Mainmenu.is_clicked(&mouse))
                 {
                     mode = "main_menu";
                     SDL_Delay(200);
@@ -697,34 +741,34 @@ int main(int argv, char **args)
         }
         else if (mode == "leaderboard")
         {
-            SDL_RenderCopy(renderer, stone_background, NULL, NULL);
-            draw_text(renderer , "Rank", arial_font2 , 50 , 43 , 0 , 0 , 0);
-            draw_text(renderer , "Username", arial_font , 150 , 50 , 0 , 0 , 0);
-            draw_text(renderer , "Normal Mode", arial_font , 400 , 50 , 0 , 0 , 0);
-            draw_text(renderer , "Timer Mode", arial_font , 550 , 50 , 0 , 0 , 0);
-            draw_text(renderer , "Stone Mode", arial_font , 700 , 50 , 0 , 0 , 0);
-            draw_text(renderer , "Fly Mode", arial_font , 850 , 50 , 0 , 0 , 0);
-            draw_text(renderer , "Total Point", arial_font2 , 1000 , 43 , 0 , 0 , 0);
+            SDL_RenderCopy(renderer, frist_page_background, NULL, NULL);
+            draw_text(renderer , "Rank", arial_font2 , 50 , 43 , 255 , 255 , 255);
+            draw_text(renderer , "Username", arial_font , 150 , 50 , 255 , 255 , 255);
+            draw_text(renderer , "Normal Mode", arial_font , 400 , 50 , 255 , 255 , 255);
+            draw_text(renderer , "Timer Mode", arial_font , 550 , 50 , 255 , 255 , 255);
+            draw_text(renderer , "Stone Mode", arial_font , 700 , 50 , 255 , 255 , 255);
+            draw_text(renderer , "Fly Mode", arial_font , 850 , 50 , 255 , 255 , 255);
+            draw_text(renderer , "Total Point", arial_font2 , 1000 , 43 , 255 , 255 , 255);
             Mainmenu.rect.w = 150;
             Mainmenu.rect.h = 90;
             Mainmenu.rect.x = screenWidth - 200;
             Mainmenu.rect.y = 650;
-            Mainmenu.Draw(renderer, &mouth);
-            SDL_SetRenderDrawColor(renderer , 0 , 0 , 0 , 0);
+            Mainmenu.Draw(renderer, &mouse);
+            SDL_SetRenderDrawColor(renderer , 255 , 255 , 255 , 0);
             for(int i = 0 ; i < count_user ; i++)
             {
                 SDL_RenderDrawLine(renderer , 20 , 90 + i*60 , screenWidth - 20 , 90 + i*60);
-                draw_text(renderer , to_string(i+1) , arial_font2 , 50 , 93 + i*60 , 0 , 0 , 0);
-                draw_text(renderer , leaderboard_user[i].username , arial_font , 150 , 100 + i*60 , 0 , 0 , 0);
-                draw_text(renderer , to_string(leaderboard_user[i].max_normal) , arial_font , 400 , 100 + i*60 , 0 , 0 , 0);
-                draw_text(renderer , to_string(leaderboard_user[i].max_timer) , arial_font , 550 , 100 + i*60 , 0 , 0 , 0);
-                draw_text(renderer , to_string(leaderboard_user[i].max_stone) , arial_font , 700 , 100 + i*60 , 0 , 0 , 0);
-                draw_text(renderer , to_string(leaderboard_user[i].max_fly) , arial_font , 850 , 100 + i*60 , 0 , 0 , 0);
-                draw_text(renderer , to_string(leaderboard_user[i].total_point) , arial_font2 , 1000 , 95 + i*60 , 0 , 0 , 0);
+                draw_text(renderer , to_string(i+1) , arial_font2 , 50 , 93 + i*60 , 255 , 255 , 255);
+                draw_text(renderer , leaderboard_user[i].username , arial_font , 150 , 100 + i*60 , 255 , 255 , 255);
+                draw_text(renderer , to_string(leaderboard_user[i].max_normal) , arial_font , 400 , 100 + i*60 , 255 , 255 , 255);
+                draw_text(renderer , to_string(leaderboard_user[i].max_timer) , arial_font , 550 , 100 + i*60 , 255 , 255 , 255);
+                draw_text(renderer , to_string(leaderboard_user[i].max_stone) , arial_font , 700 , 100 + i*60 , 255 , 255 , 255);
+                draw_text(renderer , to_string(leaderboard_user[i].max_fly) , arial_font , 850 , 100 + i*60 , 255 , 255 , 255);
+                draw_text(renderer , to_string(leaderboard_user[i].total_point) , arial_font2 , 1000 , 95 + i*60 , 255 , 255 , 255);
             }
-            if (mouthL)
+            if (mouseL)
             {
-                if (Mainmenu.is_clicked(&mouth))
+                if (Mainmenu.is_clicked(&mouse))
                 {
                     mode = "main_menu";
                     SDL_Delay(200);
@@ -733,59 +777,99 @@ int main(int argv, char **args)
         }
         else if (mode == "choose_mode")
         {
-            SDL_RenderCopy(renderer, stone_background, NULL, NULL);
-            Normal_mode.Draw(renderer, &mouth);
-            Timer_mode.Draw(renderer, &mouth);
-            Stone_mode.Draw(renderer , &mouth);
-            Fly_mode.Draw(renderer, &mouth);
-            if (mouthL)
+            SDL_RenderCopy(renderer, space_background, NULL, NULL);
+            Normal_mode.Draw(renderer, &mouse);
+            Timer_mode.Draw(renderer, &mouse);
+            Stone_mode.Draw(renderer , &mouse);
+            Fly_mode.Draw(renderer, &mouse);
+            draw_text(renderer , "Normal Mode", arial_font , 30 + 50 , screenHeight / 2 + 200, 255 , 255 , 255);
+            draw_text(renderer , "Timer Mode", arial_font , 370 + 50 , screenHeight / 2 + 200, 255 , 255 , 255);
+            draw_text(renderer , "Stone Mode", arial_font , 700 + 50 , screenHeight / 2 + 200, 255 , 255 , 255);
+            draw_text(renderer , "Fly Mode", arial_font , 1030  + 50, screenHeight / 2 + 200, 255 , 255 , 255);
+            if (mouseL)
             {
-                if (Normal_mode.is_clicked(&mouth))
+                if (Normal_mode.is_clicked(&mouse))
                 {
-                    mode = "game";
+                    mode = "choose_map";
                     game_mode = "normal";
                     SDL_Delay(200);
                 }
-                if (Timer_mode.is_clicked(&mouth))
+                if (Timer_mode.is_clicked(&mouse))
                 {
-                    mode = "game";
+                    mode = "choose_map";
                     game_mode = "timer";
                     SDL_Delay(200);
                 }
-                if (Stone_mode.is_clicked(&mouth))
+                if (Stone_mode.is_clicked(&mouse))
                 {
-                    mode = "game";
+                    mode = "choose_map";
                     game_mode = "stone";
                     SDL_Delay(200);
                 }
-                if (Fly_mode.is_clicked(&mouth))
+                if (Fly_mode.is_clicked(&mouse))
+                {
+                    mode = "choose_map";
+                    game_mode = "fly";
+                    SDL_Delay(200);
+                }
+            }
+        }
+        else if (mode == "choose_map")
+        {
+            SDL_RenderCopy(renderer, space_background, NULL, NULL);
+            First_map.Draw(renderer , &mouse);
+            Second_map.Draw(renderer , &mouse);
+            Third_map.Draw(renderer , &mouse);
+            Random_map.Draw(renderer , &mouse);
+            if (mouseL)
+            {
+                if (First_map.is_clicked(&mouse))
                 {
                     mode = "game";
-                    game_mode = "fly";
+                    current_map = 1;
+                    SDL_Delay(200);
+                }
+                if (Second_map.is_clicked(&mouse))
+                {
+                    mode = "game";
+                    current_map = 2;
+                    SDL_Delay(200);
+                }
+                if (Third_map.is_clicked(&mouse))
+                {
+                    mode = "game";
+                    current_map = 3;
+                    SDL_Delay(200);
+                }
+                if (Random_map.is_clicked(&mouse))
+                {
+                    mode = "game";
+                    current_map = 4;
                     SDL_Delay(200);
                 }
             }
         }
         else if (mode == "end_game")
         {
+            SDL_RenderCopy(renderer, frist_page_background, NULL, NULL);
             SDL_Color text_color = {0, 0, 255};
 
-            Tryagain.rect.x = 200;
-            Tryagain.rect.y = 500;
-            Tryagain.rect.w = 150;
-            Tryagain.rect.h = 90;
-            Choose_mode.rect.x = 400;
-            Choose_mode.rect.y = 500;
-            Choose_mode.rect.w = 150;
-            Choose_mode.rect.h = 90;
-            Leaderboard.rect.x = 600;
-            Leaderboard.rect.y = 500;
-            Leaderboard.rect.w = 150;
-            Leaderboard.rect.h = 90;
-            Quit.rect.x = 800;
-            Quit.rect.y = 500;
-            Quit.rect.w = 150;
-            Quit.rect.h = 90;
+            Tryagain.rect.x = 50;
+            Tryagain.rect.y = 420;
+            Tryagain.rect.w = 250;
+            Tryagain.rect.h = 58;
+            Choose_mode.rect.x = 350;
+            Choose_mode.rect.y = 420;
+            Choose_mode.rect.w = 250;
+            Choose_mode.rect.h = 58;
+            Leaderboard.rect.x = 650;
+            Leaderboard.rect.y = 420;
+            Leaderboard.rect.w = 250;
+            Leaderboard.rect.h = 58;
+            Quit.rect.x = 950;
+            Quit.rect.y = 420;
+            Quit.rect.w = 250;
+            Quit.rect.h = 58;
 
             string prize_name;
             if (prize == 0)
@@ -804,7 +888,7 @@ int main(int argv, char **args)
             draw_text(renderer , "Score", arial_font , 600 , 100, text_color.r , text_color.g , text_color.b);
             draw_text(renderer , "Time", arial_font , 800 , 100, text_color.r , text_color.g , text_color.b);
             draw_text(renderer , "Your Point", arial_font , 1000 , 100, text_color.r , text_color.g , text_color.b);
-            text_color = {200, 0, 0};
+            text_color = {255, 255, 255};
             draw_text(renderer , users[current_user].username, arial_font , 100 , 160, text_color.r , text_color.g , text_color.b);
             draw_text(renderer , game_mode, arial_font , 400 , 160, text_color.r , text_color.g , text_color.b);
             draw_text(renderer , to_string(score), arial_font , 600 , 160, text_color.r , text_color.g , text_color.b);
@@ -812,29 +896,29 @@ int main(int argv, char **args)
             draw_text(renderer , to_string(point), arial_font , 1000 , 160, text_color.r , text_color.g , text_color.b);
             draw_text(renderer , ("You win       :  " + prize_name), arial_font , 100 , 260, text_color.r , text_color.g , text_color.b , 1.2 , 1.2);
 
-            Tryagain.Draw(renderer, &mouth);
-            Leaderboard.Draw(renderer, &mouth);
-            Quit.Draw(renderer, &mouth);
-            Choose_mode.Draw(renderer, &mouth);
+            Tryagain.Draw(renderer, &mouse);
+            Leaderboard.Draw(renderer, &mouse);
+            Quit.Draw(renderer, &mouse);
+            Choose_mode.Draw(renderer, &mouse);
 
-            if (mouthL)
+            if (mouseL)
             {
-                if (Tryagain.is_clicked(&mouth))
+                if (Tryagain.is_clicked(&mouse))
                 {
                     mode = "game";
                     SDL_Delay(200);
                 }
-                if (Leaderboard.is_clicked(&mouth))
+                if (Leaderboard.is_clicked(&mouse))
                 {
                     mode = "leaderboard";
                     make_leaderboard(users , count_user , leaderboard_user);
                     SDL_Delay(200);
                 }
-                if (Quit.is_clicked(&mouth))
+                if (Quit.is_clicked(&mouse))
                 {
                     is_gameRunning = false;
                 }
-                if (Choose_mode.is_clicked(&mouth))
+                if (Choose_mode.is_clicked(&mouse))
                 {
                     mode = "choose_mode";
                     SDL_Delay(200);
@@ -845,25 +929,64 @@ int main(int argv, char **args)
         {
             bool is_ingame = true;
             Player player;
-            player.creat(Cannon, screenWidth / 2 - 200, 600, 260, 121, 54, 61);
+            if(current_map == 1)
+                player.creat(Cannon, screenWidth / 2 - 50, 380, 260, 121, 54, 61);
+            else if(current_map == 2)
+                player.creat(Cannon, screenWidth / 2 - 200, 600, 260, 121, 54, 61);
+            else if (current_map == 3)
+                player.creat(Cannon, screenWidth / 2 - 100, 500, 260, 121, 54, 61);
             map ma;
             ma.total_lenght = 0;
             ma.tex = PathTex;
-            ma.p1 = {50, screenHeight - 100};
-            ma.p2 = {screenWidth / 2 - 200, screenHeight / 2};
-            ma.p3 = {0, 0};
-            ma.p4 = {screenWidth / 4, 100};
-            ma.p5 = {screenWidth / 2, 200};
-            ma.p6 = {screenWidth, 0};
-            ma.p7 = {screenWidth - 100, screenHeight - 100};
-            ma.p8 = {screenWidth - 200 ,screenHeight +200};
-            ma.p9 = {screenWidth/2 , 400};
-            ma.p10 = {screenWidth/2 , 200};
-
+            if(current_map == 1)
+            {
+                ma.p1 = {50 , screenHeight/2};
+                ma.p2 = { 50 , -80};
+                ma.p3 = { screenWidth - 150 , -80};
+                ma.p4 = {screenWidth - 150 , screenHeight/2};
+                ma.p5 = { screenWidth - 150 , screenHeight + 70};
+                ma.p6 = { 150 , screenHeight + 70};
+                ma.p7 = {150 , screenHeight/2};
+                ma.p8 = { 150 , 30 };
+                ma.p9 = { screenWidth - 200, 30};
+                ma.p10 = { screenWidth - 250 , screenHeight/2};
+            }
+            else if (current_map == 2)
+            {
+                ma.p1 = {50, screenHeight - 100};
+                ma.p2 = {screenWidth / 2 - 200, screenHeight / 2};
+                ma.p3 = {0, 0};
+                ma.p4 = {screenWidth / 4, 100};
+                ma.p5 = {screenWidth / 2, 200};
+                ma.p6 = {screenWidth, -300};
+                ma.p7 = {screenWidth - 150, screenHeight - 100};
+                ma.p8 = {screenWidth - 200 ,screenHeight +200};
+                ma.p9 = {screenWidth/2 , 400};
+                ma.p10 = {screenWidth/2+300 , 200};
+            }
+            else if (current_map == 3)
+            {
+                ma.p1 = {50 , 100};
+                ma.p2 = {screenWidth/2 - 150 , 0};
+                ma.p3 = {screenWidth - 150 , 60};
+                ma.p4 = {screenWidth - 150 , 200};
+                ma.p5 = {screenWidth - 150 , 450};
+                ma.p6 = {140 , 180};
+                ma.p7 = {100 , 350};
+                ma.p8 = {50 , screenHeight - 50};
+                ma.p9 = {60 , screenHeight - 50};
+                ma.p10 = {screenWidth - 200, screenHeight - 50};
+            }
+            else if (current_map == 4)
+            {
+                int ptx,pty;
+                random_map(&ptx , &pty , &ma);
+                player.creat(Cannon, ptx , pty, 260, 121, 54, 61);
+            }
             SDL_SetRenderTarget(renderer, BackGround);
             SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
             SDL_RenderClear(renderer);
-            SDL_RenderCopy(renderer, stone_background, NULL, NULL);
+            SDL_RenderCopy(renderer, space_background, NULL, NULL);
             ma.draw_path(renderer);
             SDL_SetRenderTarget(renderer, NULL);
 
@@ -878,15 +1001,6 @@ int main(int argv, char **args)
             int count_ball = 80;
             Ball balls[200];
             creat_start_balls(count_ball, balls, ma.total_lenght, balls_width , game_mode , Red_marble, Green_marble, Blue_marble, Yellow_marble, Red_marble_ice, Green_marble_ice, Blue_marble_ice, Yellow_marble_ice, Black_marble, Question_marble, Stone_marble, Fly_marble);
-            //balls[29].current_loc = 800;
-            //balls[28].time_effect_mode = REVERSE;
-            //balls[28].time_effect_timer.creat();
-            //balls[29].leftConnnected = false;
-            //balls[28].rightConnnected = false;
-            //balls[28].current_loc = 560;
-            //balls[27].current_loc = 510;
-            //balls[27].leftConnnected = false;
-            //balls[26].rightConnnected = false;
 
             Ball bullet;
             make_cannon_ball(count_ball, balls, &bullet, balls_width, bullet_speed, &player, Red_marble, Green_marble, Blue_marble, Yellow_marble);
@@ -894,30 +1008,27 @@ int main(int argv, char **args)
             make_cannon_ball(count_ball, balls, &bullet2, balls_width, bullet_speed, &player, Red_marble, Green_marble, Blue_marble, Yellow_marble);
 
             Button bomb_power;
-            bomb_power.create(Bomb_power_button_norm, Bomb_power_button_selected, screenWidth - 100, screenHeight / 2 - 100, 70, 50, 300);
+            bomb_power.create(Bomb_power_button_norm, Bomb_power_button_selected, screenWidth - 100, screenHeight / 2 - 150, 70, 70, 300);
 
             Button rainbow_pawer;
-            rainbow_pawer.create(Rainbow_power_button_norm, Rainbow_power_button_selected, screenWidth - 100, screenHeight / 2, 70, 50, 300);
+            rainbow_pawer.create(Rainbow, Rainbow, screenWidth - 100, screenHeight / 2, 70, 70, 300);
 
             Button fireball_power;
-            fireball_power.create(Fireball_power_button_norm, Fireball_power_button_selected, screenWidth - 100, screenHeight / 2 - 200, 70, 50, 300);
-
-            //Button fireball_power;
-            //fireball_power.create(Fireball_power_button_norm, Fireball_power_button_selected, screenWidth - 100, screenHeight / 2 + 100, 70, 50, 300);
+            fireball_power.create(Fireball, Fireball, screenWidth - 100, screenHeight / 2 - 300, 70, 70, 300);
 
             Button Missile_power;
-            Missile_power.create(Missile_power_button_norm, Missile_power_button_selected, screenWidth - 100, screenHeight / 2 + 200, 70, 50, 300);
+            Missile_power.create(Missle_tex, Missle_tex, screenWidth - 100, screenHeight / 2 + 150, 70, 70, 300);
 
             Button Musicoff;
-            Musicoff.create(Musicoff_button_norm, Musicoff_button_selected, screenWidth/2 - 100 , 500, 200, 100, 300);
+            Musicoff.create(Musicoff_button_norm, Musicoff_button_selected, screenWidth/2 - 150, 500, 350, 100, 300);
             Button Soundoff;
-            Soundoff.create(Soundoff_button_norm, Soundoff_button_selected, screenWidth/2 - 100 , 350, 200, 100, 300);
+            Soundoff.create(Soundoff_button_norm, Soundoff_button_selected, screenWidth/2 - 150, 350, 350, 100, 300);
             Button Music_change;
-            Music_change.create(Music_change_button_norm, Music_change_button_selected, screenWidth/2 - 100 , 200, 200, 100, 300);
+            Music_change.create(Music_change_button_norm, Music_change_button_selected, screenWidth/2 - 150, 200, 350, 100, 300);
             Button Mainmenu;
-            Mainmenu.create(Mainmenu_button_norm, Mainmenu_button_selected, screenWidth/2 - 100 , 650, 200, 100, 300);
+            Mainmenu.create(Mainmenu_button_norm, Mainmenu_button_selected, screenWidth/2 - 150, 650, 350, 100, 300);
             Button Resume;
-            Resume.create(Resume_button_norm, Resume_button_selected, screenWidth/2 - 100 , 50, 200, 100, 300);
+            Resume.create(Resume_button_norm, Resume_button_selected, screenWidth/2- 150 , 50, 350, 100, 300);
 
             Timer bullet_shoot;
             Timer time_effect_timer;
@@ -967,15 +1078,15 @@ int main(int argv, char **args)
                         is_ingame = false;
                         break;
                     case SDL_MOUSEMOTION:
-                        SDL_GetMouseState(&mouth.x, &mouth.y);
+                        SDL_GetMouseState(&mouse.x, &mouse.y);
                         break;
                     case SDL_MOUSEBUTTONDOWN:
                         if (event.button.button == SDL_BUTTON_LEFT)
-                            mouthL = true;
+                            mouseL = true;
                         break;
                     case SDL_MOUSEBUTTONUP:
                         if (event.button.button == SDL_BUTTON_LEFT)
-                            mouthL = false;
+                            mouseL = false;
                         break;
                     case SDL_KEYDOWN:
                         game_keyboard.keydown(&event);
@@ -1006,12 +1117,12 @@ int main(int argv, char **args)
                 SDL_RenderClear(renderer);
                 if(is_stop)
                 {
-                    SDL_RenderCopy(renderer, stone_background, NULL, NULL);
-                    Resume.Draw(renderer , &mouth);
-                    Mainmenu.Draw(renderer , &mouth);
-                    Music_change.Draw(renderer , &mouth);
-                    Musicoff.Draw(renderer , &mouth);
-                    Soundoff.Draw(renderer , &mouth);
+                    SDL_RenderCopy(renderer, space_background, NULL, NULL);
+                    Resume.Draw(renderer , &mouse);
+                    Mainmenu.Draw(renderer , &mouse);
+                    Music_change.Draw(renderer , &mouse);
+                    Musicoff.Draw(renderer , &mouse);
+                    Soundoff.Draw(renderer , &mouse);
                     string music_status,sound_status;
                     if(music_player.is_effect_on)
                         sound_status = "ON";
@@ -1021,35 +1132,35 @@ int main(int argv, char **args)
                         music_status = "ON";
                     else
                         music_status = "OFF";
-                    draw_text(renderer , sound_status, arial_font2 , 800 , Soundoff.rect.y +Soundoff.rect.h/2 -15 , 0 , 0 , 0);
-                    draw_text(renderer , music_status, arial_font2 , 800 , Musicoff.rect.y +Musicoff.rect.h/2 -15 , 0 , 0 , 0);
-                    if(mouthL)
+                    draw_text(renderer , sound_status, arial_font2 , 850 , Soundoff.rect.y +Soundoff.rect.h/2 -15 , 255 , 255 , 255);
+                    draw_text(renderer , music_status, arial_font2 , 850 , Musicoff.rect.y +Musicoff.rect.h/2 -15 , 255 , 255 , 255);
+                    if(mouseL)
                     {
-                        if (Resume.is_clicked(&mouth))
+                        if (Resume.is_clicked(&mouse))
                         {
                             SDL_Delay(150);
                             is_stop = false;
                             game_timer.restart();
                             time_effect_timer.restart();
                         }
-                        if (Mainmenu.is_clicked(&mouth))
+                        if (Mainmenu.is_clicked(&mouse))
                         {
                             SDL_Delay(150);
                             is_ingame = false;
                             mode = "main_menu";
                         }
-                        if (Soundoff.is_clicked(&mouth))
+                        if (Soundoff.is_clicked(&mouse))
                         {
                             if(music_player.is_effect_on)
                                 music_player.is_effect_on = false;
                             else
                                 music_player.is_effect_on = true;
                         }
-                        if (Music_change.is_clicked(&mouth))
+                        if (Music_change.is_clicked(&mouse))
                         {
                             Mix_HaltMusic();
                         }
-                        if (Musicoff.is_clicked(&mouth))
+                        if (Musicoff.is_clicked(&mouse))
                         {
                             if(music_on)
                             {
@@ -1099,6 +1210,7 @@ int main(int argv, char **args)
                         }
                         if (balls[i].current_loc > ma.total_lenght && balls[i].color != "Stone")
                         {
+                            cout<<"here4";
                             is_ingame = false;
                             mode = "end_game";
                             end_game(game_mode, score, &game_timer, &point, &prize , users , count_user , current_user);
@@ -1115,14 +1227,12 @@ int main(int argv, char **args)
                             count_ball--;
                             score++;
                         }
-                        //cout<<balls[i].leftConnnected<<balls[i].rightConnnected<<" ";
-                        // cout<<balls[i].current_loc<<" ";
                     }
-                    //cout<<endl;
                     if (game_mode == "normal" || game_mode == "timer" || game_mode == "stone" || game_mode == "fly")
                     {
                         if (count_ball == 0)
                         {
+                            cout<<"here3";
                             is_ingame = false;
                             mode = "end_game";
                             end_game(game_mode, score, &game_timer, &point, &prize , users , count_user , current_user);
@@ -1130,20 +1240,23 @@ int main(int argv, char **args)
                     }
                     if((game_mode == "stone" && score == 10) || (game_mode == "fly" && score == 10))
                     {
+                        cout<<"here1";
                         is_ingame = false;
                         mode = "end_game";
                         end_game(game_mode, score, &game_timer, &point, &prize , users , count_user , current_user);
                     }
                     if ((max_timer_mode_lenght - (game_timer.get_current_time() - game_timer.start)) <= 0)
                     {
+                        cout<<"here2";
                         is_ingame = false;
                         mode = "end_game";
                         end_game(game_mode, score, &game_timer, &point, &prize , users , count_user , current_user);
                     }
 
-                    if (!bomb_power.is_inside(&mouth) && !rainbow_pawer.is_inside(&mouth) && !fireball_power.is_inside(&mouth) && ((mouthL && in_air_count == 0) || (mouthL && bullet.is_in_cannon && in_air_count < 20 && bullet_shoot.get_current_time() > 600)))
+                    if (!bomb_power.is_inside(&mouse) && !rainbow_pawer.is_inside(&mouse) && !fireball_power.is_inside(&mouse) && ((mouseL && in_air_count == 0) || (mouseL && bullet.is_in_cannon && in_air_count < 20 && bullet_shoot.get_current_time() > 600)))
                     {
-                        bullet.shoot(&mouth);
+                        bullet.shoot(&mouse);
+                        music_player.play_chunk("fire");
                         in_air_balls[in_air_count] = bullet;
                         bullet_shoot.creat();
                         in_air_count++;
@@ -1176,8 +1289,8 @@ int main(int argv, char **args)
                             }
                         }
                     }
-                    bullet2.Draw2(renderer , &mouth , &player);
-                    player.Draw(renderer, &mouth);
+                    bullet2.Draw2(renderer , &mouse , &player);
+                    player.Draw(renderer, &mouse);
                     if (game_keyboard.get_current() != '!')
                     {
                         if (game_keyboard.curruntK == ' ')
@@ -1195,14 +1308,14 @@ int main(int argv, char **args)
                         delete_ball(in_air_balls, in_air_count, deleted_index);
                         in_air_count--;
                     }
-                    bomb_power.Draw(renderer, &mouth);
-                    rainbow_pawer.Draw(renderer, &mouth);
-                    fireball_power.Draw(renderer, &mouth);
-                    Missile_power.Draw(renderer, &mouth);
+                    bomb_power.Draw(renderer, &mouse);
+                    rainbow_pawer.Draw(renderer, &mouse);
+                    fireball_power.Draw(renderer, &mouse);
+                    Missile_power.Draw(renderer, &mouse);
 
-                    if (mouthL)
+                    if (mouseL)
                     {
-                        if (bomb_power.is_clicked(&mouth))
+                        if (bomb_power.is_clicked(&mouse))
                         {
                             if(users[current_user].bomb_power > 0 )
                             {    
@@ -1210,7 +1323,7 @@ int main(int argv, char **args)
                                 users[current_user].bomb_power--;
                             }
                         }
-                        if (rainbow_pawer.is_clicked(&mouth))
+                        if (rainbow_pawer.is_clicked(&mouse))
                         {
                             if(users[current_user].rainbow_power > 0)
                             {
@@ -1218,7 +1331,7 @@ int main(int argv, char **args)
                                 users[current_user].rainbow_power--;
                             }
                         }
-                        if (Missile_power.is_clicked(&mouth))
+                        if (Missile_power.is_clicked(&mouse))
                         {
                             if(users[current_user].missile_power > 0 && !missile.is_lounched)
                             {
@@ -1227,7 +1340,7 @@ int main(int argv, char **args)
                                 missile.lounch();
                             }
                         }
-                        if (fireball_power.is_clicked(&mouth))
+                        if (fireball_power.is_clicked(&mouse))
                         {
                             if(users[current_user].fireball_power > 0)
                             {
@@ -1237,6 +1350,11 @@ int main(int argv, char **args)
                             }
                         }
                     }
+                    draw_text(renderer , to_string(users[current_user].bomb_power), arial_font , screenWidth - 80 , screenHeight / 2 - 60 , timer_color.r , timer_color.g , timer_color.b);
+                    draw_text(renderer , to_string(users[current_user].fireball_power), arial_font , screenWidth - 80 , screenHeight / 2 - 210 , timer_color.r , timer_color.g , timer_color.b);
+                    draw_text(renderer , to_string(users[current_user].missile_power), arial_font , screenWidth - 80 , screenHeight / 2 + 230 , timer_color.r , timer_color.g , timer_color.b);
+                    draw_text(renderer , to_string(users[current_user].rainbow_power), arial_font , screenWidth - 80 , screenHeight / 2 + 90 , timer_color.r , timer_color.g , timer_color.b);
+
                     missile.update();
                     missile.hit(balls , &count_ball , &score , game_mode);
                     missile.Draw(renderer);
@@ -1258,10 +1376,7 @@ int main(int argv, char **args)
         SDL_RenderPresent(renderer);
         frameTime = SDL_GetTicks() - frameStart;
         if (frameTime < frameDelay)
-        {
-            //cout<<frameDelay - frameTime<<endl;
             SDL_Delay(frameDelay - frameTime);
-        }
     }
 
     return 0;

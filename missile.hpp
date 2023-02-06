@@ -40,6 +40,7 @@ struct Missile
         {
             if (is_hited())
             {
+                music_player.play_chunk("explotion");
                 int first = -1;
                 int count = 0;
                 int deleted[200];
@@ -60,7 +61,7 @@ struct Missile
                 *count_ball -= count;
                 if(game_mode != "stone" && game_mode != "fly")
                     *score += count;
-                is_lounched = false;
+                is_lounched = false;                
             }
         }
     }
